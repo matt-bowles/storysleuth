@@ -13,7 +13,7 @@
 
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
-  <title>SnapGuessr</title>
+  <title>Where Am I?</title>
 </head>
 
 <style>
@@ -58,10 +58,16 @@
         </div>
         <div class="row">
           <div class="col-sm">
-            <video controls>
-              <source src="<%=storyURL%>" type="video/mp4">
+            <video controls id="video_player">
+              <source src="" type="video/mp4">
             </video>
-            <h3 id="timestamp"><%=timestamp%></h3> 
+            <!-- Start with default story - no. 0 in json array -->
+            <h3 id="timestamp"><%=stories[0].timestamp%></h3> 
+
+            <!-- Story nav buttons -->
+            <button onclick="prevStory()"><-- Prev</button>
+            <button onclick="nextStory()">Next --></button>
+
           </div>
           <div class="col-lg">
             <div id="mapid"></div>
@@ -75,10 +81,43 @@
       <p style="visibility: hidden" id="loclat"><%=lat%></p>
       <p style="visibility: hidden" id="loclong"><%=long%></p>
 
+      <p style="visibility: hidden" id="stories"><%=stories%></p>
+
     
 </body>
 
   <script>
+    let storyCounter = 0;
+    let stories = JSON.parse($('#stories').text());
+
+    $(document).ready(function () {
+      showStory();
+    });
+
+    function nextStory() {
+      if (stories[storyCounter+1]) {
+        storyCounter++;
+        showStory();
+      }
+    }
+
+    function prevStory() {
+      if (stories[storyCounter-1]) {
+        storyCounter--;
+        showStory();
+      }
+    }
+
+    function showStory() {
+      $('#video_player').attr("src", stories[storyCounter].storyURL);
+
+      $('#timestamp').text(stories[storyCounter].timestamp);
+
+      // $('#video_player').load();
+    }
+
+
+
     // Define the custom 'real-location' icon
     var locIcon = L.icon({
       iconUrl: 'C:/xampp_install/htdocs/whereami/location-icon.png',
@@ -89,7 +128,6 @@
       worldCopyJump: true,
     }).setView([0, 0], 0);
     var markers = [];
-
     $("#guessButton").attr("disabled", true);
 
 

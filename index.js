@@ -7,7 +7,7 @@ const cities = require('./cities.json');
 
 const RADIUS = 3000;   // in metres
 const ZOOM = 2;        // between 2-18
-const MIN_STORIES = 3; // the min. amount of stories a successful playlist must have
+const MIN_STORIES = 5; // the min. amount of stories a successful playlist must have
 
 
 app.set('view engine', 'ejs');
@@ -69,23 +69,32 @@ function deleteCity(city) {
 }
 
 function doShit(playlist, res) {
-  // Get random story from playlist
-  var story = playlist.elements[Math.floor(Math.random()*playlist.totalCount)];
+  // Get random stories from playlist
+  stories = [];
+
+  for (var i=0; i<MIN_STORIES; i++) {
+    stories.push(playlist.elements[Math.floor(Math.random()*playlist.totalCount)]);
+
+    // get timestamp for each story - How long ago was the story posted?
+    stories[i].timestamp = timeSince(stories[i].timestamp);
+
+    var suffix = (stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl) ? stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl : stories[i].snapInfo.streamingMediaInfo.mediaUrl;
+
+    stories[i].storyURL = stories[i].snapInfo.streamingMediaInfo.prefixUrl + suffix;
+
+    console.log(stories[i].storyURL);
+  }
 
   try {
-  var suffix = (story.snapInfo.streamingMediaInfo.mediaWithOverlayUrl) ? story.snapInfo.streamingMediaInfo.mediaWithOverlayUrl : story.snapInfo.streamingMediaInfo.mediaUrl;
+  
   } catch (err) {
     console.log("wtf happened bro");
   }
-  var storyURL = story.snapInfo.streamingMediaInfo.prefixUrl + suffix;
-
-  // How long ago was the story posted?
-  var timestamp = timeSince(story.timestamp);
 
   console.log(city.city + ", " + city.country + " - " + playlist.totalCount + " stories found!");
 
-  // return res.send(playlist); 
-  return res.render('home', {storyURL: storyURL, timestamp: timestamp, lat: city.lat, long: city.lng}); 
+  // return res.send(stories); 
+  return res.render('home', {stories: JSON.stringify(stories), lat: city.lat, long: city.lng}); 
 }
 
 function timeSince(timeStamp) {
