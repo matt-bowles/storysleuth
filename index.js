@@ -16,7 +16,6 @@ app.set('view engine', 'ejs');
 
 // home route
 app.get('/', (req, res) => {
-  // var data = getStories();9
   console.log();
   city = getCity();
 
@@ -77,9 +76,6 @@ function doShit(playlist, res) {
   var suffix = (story.snapInfo.streamingMediaInfo.mediaWithOverlayUrl) ? story.snapInfo.streamingMediaInfo.mediaWithOverlayUrl : story.snapInfo.streamingMediaInfo.mediaUrl;
   } catch (err) {
     console.log("wtf happened bro");
-    console.log("Finding a new city...");
-    city = getCity();
-    return getStory(res, city);
   }
   var storyURL = story.snapInfo.streamingMediaInfo.prefixUrl + suffix;
 
