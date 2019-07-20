@@ -18,7 +18,7 @@
 
 <style>
   #mapid {
-    width: 100%;
+    width: 150%;
     height: 650px;
   }
   
@@ -54,6 +54,7 @@
     </nav>
 
     <div class="container">
+        <div class="row">Your score is: <span id="score"></span></div>
         <div class="row" id="guessResult">
         </div>
         <div class="row">
@@ -65,8 +66,8 @@
             <h3 id="timestamp"><%=stories[0].timestamp%></h3> 
 
             <!-- Story nav buttons -->
-            <button onclick="prevStory()"><-- Prev</button>
-            <button onclick="nextStory()">Next --></button>
+            <button id="prevBtn" onclick="prevStory()" disabled><-- Prev</button>
+            <button id="nextBtn" onclick="nextStory()">Next --></button>
 
           </div>
           <div class="col-lg">
@@ -87,17 +88,26 @@
 </body>
 
   <script>
+    let score = 100;
     let storyCounter = 0;
     let stories = JSON.parse($('#stories').text());
 
     $(document).ready(function () {
       showStory();
+      updateScore(score);
+
+      $('#prevBtn').attr("disabled", "true");
     });
 
     function nextStory() {
       if (stories[storyCounter+1]) {
         storyCounter++;
         showStory();
+
+        $('#prevBtn').removeAttr("disabled");
+        if (storyCounter+1 == stories.length) {
+          $('#nextBtn').attr("disabled", "true");
+        }
       }
     }
 
@@ -105,15 +115,17 @@
       if (stories[storyCounter-1]) {
         storyCounter--;
         showStory();
+
+        $('#nextBtn').removeAttr("disabled");
+        if (storyCounter == 0) {
+          $('#prevBtn').attr("disabled", "true");
+        }
       }
     }
 
     function showStory() {
       $('#video_player').attr("src", stories[storyCounter].storyURL);
-
       $('#timestamp').text(stories[storyCounter].timestamp);
-
-      // $('#video_player').load();
     }
 
 
@@ -131,8 +143,8 @@
     $("#guessButton").attr("disabled", true);
 
 
-    L.tileLayer('https://api.maptiler.com/maps/voyager/{z}/{x}/{y}.png?key=INrAl64yCwwD46VnyvvG', {
-        attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">© MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a>'
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+	    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
     }).addTo(map);
 
     map.on('click', function(e) {
@@ -182,9 +194,17 @@
         // fly to actual location
         map.flyTo(markers['locMarker'].getLatLng());
 
+        // update score
+        updateScore(dist);
+
       }
 
     });
+
+    function updateScore(dist) {
+      score += dist;
+      $('#score').text(score);
+    }
 
     function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
     var R = 6371; // Radius of the earth in km

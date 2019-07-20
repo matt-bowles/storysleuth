@@ -1,6 +1,5 @@
 const express = require('express');
 const snapMap = require('snapmap');
-const ejs = require('ejs');
 const app = express();
 
 const cities = require('./cities.json');
@@ -13,40 +12,29 @@ const MIN_STORIES = 5; // the min. amount of stories a successful playlist must 
 app.set('view engine', 'ejs');
 
 
-
 // home route
 app.get('/', (req, res) => {
   console.log();
   city = getCity();
 
   // Get stories for city
-  playlist = getStory(res, city);
-
-  // return res.render('home', {storyURL: "storyURL", timestamp: timestamp}); 
+  playlist = getStories(res, city);
 });
 
 
-function getStory(res, city) {
+function getStories(res, city) {
   snapMap.getPlaylist(city.lat, city.lng, RADIUS, ZOOM)
     .then((pl) => { 
       console.log(pl.totalCount + " stories found!");
       if (!isNaN(pl.totalCount) && pl.totalCount >= MIN_STORIES) {
-        console.log("Doing shit...");
-        console.log(city.lat + ", " + city.lng);
-        doShit(pl, res);
-      }
-
-      // Story is rejected
-      else {
-        // Delete city from cities.json
-        // cities.filter(function(data) {
-        //   return data.id !== city.id;
-        // });
-
+        console.log("Successful city found!");
+        processPlaylist(pl, res, city);
+        return;
+      } else {
         // Find new city
         console.log("Finding a new city...");
         newCity = getCity();
-        getStory(res, newCity);
+        getStories(res, newCity);
       }
     })
     .catch((error) => {
@@ -56,8 +44,13 @@ function getStory(res, city) {
 
 function getCity() {
   // Find city and print it
-  var city = cities[Math.floor(Math.random()*cities.length)];
-  console.log(city.city + ", " + city.country);
+  do {
+    var city = cities[Math.floor(Math.random()*cities.length)];
+    console.log(city.city + ", " + city.country);
+  } 
+  // no USA
+  while (city.country == "United States");
+  
   return city;
 }
 
@@ -68,27 +61,21 @@ function deleteCity(city) {
   
 }
 
-function doShit(playlist, res) {
+function processPlaylist(playlist, res, city) {
   // Get random stories from playlist
   stories = [];
 
   for (var i=0; i<MIN_STORIES; i++) {
-    stories.push(playlist.elements[Math.floor(Math.random()*playlist.totalCount)]);
+    var num = [Math.floor(Math.random()*playlist.totalCount)]; 
+
+    stories.push(playlist.elements[num]);
+    delete playlist.elements[0];
 
     // get timestamp for each story - How long ago was the story posted?
     stories[i].timestamp = timeSince(stories[i].timestamp);
 
-    var suffix = (stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl) ? stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl : stories[i].snapInfo.streamingMediaInfo.mediaUrl;
-
+    var suffix = stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl ? stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl : stories[i].snapInfo.streamingMediaInfo.mediaUrl;
     stories[i].storyURL = stories[i].snapInfo.streamingMediaInfo.prefixUrl + suffix;
-
-    console.log(stories[i].storyURL);
-  }
-
-  try {
-  
-  } catch (err) {
-    console.log("wtf happened bro");
   }
 
   console.log(city.city + ", " + city.country + " - " + playlist.totalCount + " stories found!");
@@ -99,7 +86,7 @@ function doShit(playlist, res) {
 
 function timeSince(timeStamp) {
   var now = new Date(),
-    secondsPast = (now.getTime() - timeStamp) / 1000;
+      secondsPast = (now.getTime() - timeStamp) / 1000;
   if(secondsPast < 60){
     return parseInt(secondsPast) + ' seconds ago';
   }
