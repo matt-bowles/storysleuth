@@ -69,13 +69,29 @@ function processPlaylist(playlist, res, city) {
     var num = [Math.floor(Math.random()*playlist.totalCount)]; 
 
     stories.push(playlist.elements[num]);
-    delete playlist.elements[0];
+    // delete playlist.elements[0];
 
     // get timestamp for each story - How long ago was the story posted?
-    stories[i].timestamp = timeSince(stories[i].timestamp);
+    try {
+      stories[i].timestamp = timeSince(stories[i].timestamp);
+    } catch (e) {
+      console.log(e);
+      playlist.error = "Timestamp error";
+      return res.send(playlist);
+    }
 
-    var suffix = stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl ? stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl : stories[i].snapInfo.streamingMediaInfo.mediaUrl;
-    stories[i].storyURL = stories[i].snapInfo.streamingMediaInfo.prefixUrl + suffix;
+    // It's a video
+    if (stories[i].snapInfo.streamingMediaInfo) {
+      var suffix = stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl ? stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl : stories[i].snapInfo.streamingMediaInfo.mediaUrl;
+      stories[i].storyURL = stories[i].snapInfo.streamingMediaInfo.prefixUrl + suffix;
+    } 
+    
+    // It's an image
+    else {
+      console.log("It's an image");
+      stories[i].storyURL = stories[i].snapInfo.publicMediaInfo.publicImageMediaInfo.mediaUrl;
+      stories[i].isImage = true;
+    }
   }
 
   console.log(city.city + ", " + city.country + " - " + playlist.totalCount + " stories found!");
