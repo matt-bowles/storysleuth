@@ -88,13 +88,13 @@
 </body>
 
   <script>
-    let score = 100;
+    let score = 0;
     let storyCounter = 0;
     let stories = JSON.parse($('#stories').text());
 
     $(document).ready(function () {
       showStory();
-      updateScore(score);
+      updateScore(0);
 
       $('#prevBtn').attr("disabled", "true");
     });
@@ -195,7 +195,7 @@
         map.flyTo(markers['locMarker'].getLatLng());
 
         // update score
-        updateScore(dist);
+        updateScore(Math.floor(dist));
 
       }
 
