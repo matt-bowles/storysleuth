@@ -73,30 +73,36 @@
           <div class="col-lg">
             <div id="mapid"></div>
             <button type="button" class="btn btn-danger" id="guessButton">Make guess</button>
+            <button type="button" class="btn btn-primary" id="nextRoundBtn">Next round</button>
           </div>
         </div>
       </div>
 
     
       <!-- Sneakret game info -->
-      <p style="visibility: hidden" id="loclat"><%=lat%></p>
-      <p style="visibility: hidden" id="loclong"><%=long%></p>
-
-      <p style="visibility: hidden" id="stories"><%=stories%></p>
+      <p style="visibility: hidden" id="playlist"><%=playlist%></p>
 
     
 </body>
 
   <script>
+    let round = 1;
+    const MAX_ROUNDS = 5;
+
     let score = 0;
     let storyCounter = 0;
-    let stories = JSON.parse($('#stories').text());
+    let playlist = JSON.parse($('#playlist').text());
+    let coords = playlist.coords;
+    let stories = playlist.stories;
 
     $(document).ready(function () {
       showStory();
       updateScore(0);
 
+      console.log(playlist);
+
       $('#prevBtn').attr("disabled", "true");
+      $('#nextRoundBtn').hide();
     });
 
     function nextStory() {
@@ -172,12 +178,10 @@
       e.preventDefault();
 
       if (!markers['locMarker']) {
-        var locLat = $('#loclat').text();
-        var locLong = $('#loclong').text();
 
         // add location marker
 
-        markers['locMarker'] = L.marker([locLat, locLong], {icon: locIcon}).addTo(map);
+        markers['locMarker'] = L.marker([coords.lat, coords.lng], {icon: locIcon}).addTo(map);
 
         // calculate distance between guess and location
 
@@ -188,7 +192,7 @@
         var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
 
         // display info
-        var dist = getDistanceFromLatLonInKm(locLat, locLong, lat, lon);
+        var dist = getDistanceFromLatLonInKm(coords.lat, coords.lng, lat, lon);
         $('#guessResult').html(`Your guess was <b> ${dist} km</b> away from the correct location.`);
 
         // fly to actual location
@@ -196,6 +200,12 @@
 
         // update score
         updateScore(Math.floor(dist));
+
+        if (round < MAX_ROUNDS) {
+          $('#nextRoundBtn').show();
+        } else {
+          // Present final score
+        }
 
       }
 
@@ -205,6 +215,41 @@
       score += dist;
       $('#score').text(score);
     }
+
+    $('#nextRoundBtn').click(function (e) { 
+      e.preventDefault();
+
+      $('#nextRoundBtn').hide();
+      round++;
+      console.log(`Round ${round} out of ${MAX_ROUNDS}`);
+
+      // Fix up the map
+      map.removeLayer(markers['guessMarker']);
+      map.removeLayer(markers['locMarker']);
+      clearMap(map);
+      markers = [];
+      $("#guessButton").attr("disabled", true);
+      $('#guessResult').text(" ");
+
+      map.setView([0, 0], 0);
+      
+
+      const fetchPromise = fetch('/api/');
+      fetchPromise.then(response => {
+        return response.json();
+      }).then(pl => {
+
+        playlist = pl;
+        coords = playlist.coords;
+        stories = playlist.stories;
+
+        console.log(playlist);
+
+        storyCounter = 0;
+        showStory();
+
+      });
+    });
 
     function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
     var R = 6371; // Radius of the earth in km
@@ -224,6 +269,19 @@
   function deg2rad(deg) {
     return deg * (Math.PI/180)
   }
+
+  function clearMap(m) {
+    for(i in m._layers) {
+        if(m._layers[i]._path != undefined) {
+            try {
+                m.removeLayer(m._layers[i]);
+            }
+            catch(e) {
+                console.log("problem with " + e + m._layers[i]);
+            }
+        }
+    }
+}
   </script>
 
 </html>

@@ -38,4 +38,6 @@ Thumbs.db
 
 # Some other stuff I guess #
 ############################
-/node_modules
+node_modules
+cities.json
+backup

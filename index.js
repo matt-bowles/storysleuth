@@ -9,16 +9,24 @@ const RADIUS = 3000;   // in metres
 const ZOOM = 2;        // between 2-18
 const MIN_STORIES = 5; // the min. amount of stories a successful playlist must have
 
+// Things
+const NEW_ROUND = "NEW_ROUND";
+const NEW_GAME = "NEW_GAME";
+
 // Set view engine
 app.set('view engine', 'ejs');
 
+// API
+app.get('/api/', (req, res) => {
+  getStories(res, NEW_ROUND);
+});
 
 // home route
 app.get('/', (req, res) => {
   console.log();
 
   // Get stories for a random city
-  playlist = getStories(res, getCity());
+  getStories(res, NEW_GAME);
 });
 
 /**
@@ -26,24 +34,24 @@ app.get('/', (req, res) => {
  * @param {*} res   The response object that will be sent to the browser
  * @param {*} city  The city for which the stories will be searched for
  */
-function getStories(res, city) {
+function getStories(res, onSuccess) {
+  var city = getCity();
+
   snapMap.getPlaylist(city.lat, city.lng, RADIUS, ZOOM)
     .then((pl) => { 
       console.log(pl.totalCount + " stories found!");
 
-      // If stories exist, and the playlist contains the min. amount of stories...
+      // If stories exist, an d the playlist contains the min. amount of stories...
       if (!isNaN(pl.totalCount) && pl.totalCount >= MIN_STORIES) {
         console.log("Successful city found!");
-
-        // Process the playlist - e.g. get timestamp, URLS, etc.
-        processPlaylist(pl, res, city);
-        return;
+          // Process the playlist - e.g. get timestamp, URLS, etc.
+          processPlaylist(pl, res, city, onSuccess);
       } 
 
       // Not enough stories, find new city
       else {
         console.log("Finding a new city...");
-        getStories(res, getCity());
+        getStories(res, onSuccess);
       }
     })
     .catch((error) => {
@@ -80,7 +88,7 @@ function deleteCity(city) {
  * @param {*} res       The response object to be sent back to the client.
  * @param {*} city      The name of the city 
  */
-function processPlaylist(playlist, res, city) {
+function processPlaylist(playlist, res, city, onSuccess) {
   stories = [];   // Holds MIN_STORIES amount of stories
 
   // Get random stories from playlist
@@ -92,8 +100,9 @@ function processPlaylist(playlist, res, city) {
 
     // Get timestamp for each story - How long ago was the story posted?
     try {
-      stories[i].timestamp = timeSince(stories[i].timestamp);
+      stories[i].timestamp = timeSince(stories[i].timestamp - stories[i].captureTimestamp);
     } catch (e) {
+      stories[i].timestamp = "Error getting timestamp";
       console.log(e);
       playlist.error = "Timestamp error";
       return res.send(playlist);
@@ -114,10 +123,19 @@ function processPlaylist(playlist, res, city) {
     }
   }
 
-  console.log(city.city + ", " + city.country + " - " + playlist.totalCount + " stories found!");
+  console.log(city.city + ", " + city.country + " - " + playlist.totalCount + " stories found!"); 
 
-  // return res.send(stories); 
-  return res.render('home', {stories: JSON.stringify(stories), lat: city.lat, long: city.lng}); 
+  // Initalise playlist object
+  playlist = {};
+
+  playlist.coords = {lat: city.lat, lng: city.lng};
+  playlist.stories = stories;
+
+  if (onSuccess == NEW_ROUND) {
+    return res.send(playlist); 
+  } else if (onSuccess == NEW_GAME) {
+    return res.render('home', {playlist: JSON.stringify(playlist)});
+  } 
 }
 
 /**
@@ -125,23 +143,15 @@ function processPlaylist(playlist, res, city) {
  * @param {*} timeStamp A unix timestamp
  */
 function timeSince(timeStamp) {
-  var now = new Date(),
-      secondsPast = (now.getTime() - timeStamp) / 1000;
-  if(secondsPast < 60){
-    return parseInt(secondsPast) + ' seconds ago';
-  }
-  if(secondsPast < 3600){
-    return parseInt(secondsPast/60) + ' minutes ago';
-  }
-  if(secondsPast <= 86400){
-    return parseInt(secondsPast/3600) + ' hours ago';
-  }
-  if(secondsPast > 86400){
-      day = timeStamp.getDate();
-      month = timeStamp.toDateString().match(/ [a-zA-Z]*/)[0].replace(" ","");
-      year = timeStamp.getFullYear() == now.getFullYear() ? "" :  " "+timeStamp.getFullYear();
-      return day + " " + month + year;
-  }
+  var time = (new Date).getTime() - timeStamp;
+
+  var minutes = Math.floor(time/60);
+
+  var seconds = time - minutes * 60;
+
+  return minutes + " minutes and " + seconds + " seconds ago";
+  
+  
 }
 
 app.listen(3000, () => console.log('The application is running on localhost:3000!'));
