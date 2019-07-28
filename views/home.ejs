@@ -72,7 +72,7 @@
           </div>
           <div class="col-lg">
             <div id="mapid"></div>
-            <button type="button" class="btn btn-danger" id="guessButton">Make guess</button>
+            <button type="button" class="btn btn-danger" id="guessButton" disabled>Make guess</button>
             <button type="button" class="btn btn-primary" id="nextRoundBtn">Next round</button>
           </div>
         </div>
@@ -95,16 +95,44 @@
     let coords = playlist.coords;
     let stories = playlist.stories;
 
+    /**************************/
+    /* MAP SETUP (Leaflet.js) */
+    /**************************/ 
+
+    // Initalise map
+    var map = L.map('mapid', {
+      worldCopyJump: true,
+    }).setView([0, 0], 0);
+    var markers = [];
+
+    // Add a tileset to the map - very pretty.
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+	    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
+    }).addTo(map);
+
+    // Define custom icon for actual location.
+    var locIcon = L.icon({
+      iconUrl: 'C:/xampp_install/htdocs/whereami/location-icon.png',
+      iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
+    });
+
+
+    /**
+     * Initialise the game.
+     *    - Show first story in playlist.
+     *    - Initalise player's score (to 0).
+     *    - Disable previous button (the player can't play the previous video...).
+     *    - Hide the next round button (made visible when player guesses). 
+     */
     $(document).ready(function () {
       showStory();
       updateScore(0);
-
-      console.log(playlist);
-
-      $('#prevBtn').attr("disabled", "true");
       $('#nextRoundBtn').hide();
     });
 
+    /**
+     * Shows the next story in the current playlist, if it exists.
+     */ 
     function nextStory() {
       if (stories[storyCounter+1]) {
         storyCounter++;
@@ -117,6 +145,9 @@
       }
     }
 
+    /**
+     * Shows the previous story in the current playlist, if it exists. 
+     */
     function prevStory() {
       if (stories[storyCounter-1]) {
         storyCounter--;
@@ -129,30 +160,23 @@
       }
     }
 
+    /**
+     * Displays a "video" in the video player. Also updates the timestamp value.
+     */
     function showStory() {
+      // Display video.
       $('#video_player').attr("src", stories[storyCounter].storyURL);
+
+      // Show timestamp.
       $('#timestamp').text(stories[storyCounter].timestamp);
     }
 
-
-
-    // Define the custom 'real-location' icon
-    var locIcon = L.icon({
-      iconUrl: 'C:/xampp_install/htdocs/whereami/location-icon.png',
-      iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
-    });
-
-    var map = L.map('mapid', {
-      worldCopyJump: true,
-    }).setView([0, 0], 0);
-    var markers = [];
-    $("#guessButton").attr("disabled", true);
-
-
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-	    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
-    }).addTo(map);
-
+    /**
+     * Handles what happens when the user clicks on the map.
+     *    - Remove current guess marker (if it exists).
+     *    - Add guess marker to where the player clicked.
+     *    - Allow the guess to be made (enable guess button).
+     */ 
     map.on('click', function(e) {
       if (!markers['locMarker']) {
       // Get coords of where the user clicked
@@ -174,48 +198,61 @@
     }
     });
 
+    /**
+     * Clicking the guess button will do the following things:
+     *    - Add map marker to actual location.
+     *    - Draw a line on the map between guess and actual location.
+     *    - Update the player's score.
+     *    - Reposition map to focus on the actual location.
+     *    - Display button to load next round _OR_ present the final score.
+     */
     $('#guessButton').click(function(e) {
       e.preventDefault();
 
       if (!markers['locMarker']) {
 
-        // add location marker
-
+        // Add location marker to map
         markers['locMarker'] = L.marker([coords.lat, coords.lng], {icon: locIcon}).addTo(map);
 
-        // calculate distance between guess and location
-
-        var latlngs = Array();
+        var latlngs = Array();  // Contains both the lat/lng positions of the guess and actual location.
 
         latlngs.push(markers['guessMarker'].getLatLng());
         latlngs.push(markers['locMarker'].getLatLng());
+
+        // Draw line between guess and actual location.
         var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
 
-        // display info
+        // Display guess info - how far off was the player?
         var dist = getDistanceFromLatLonInKm(coords.lat, coords.lng, lat, lon);
         $('#guessResult').html(`Your guess was <b> ${dist} km</b> away from the correct location.`);
 
-        // fly to actual location
+        // Fly to actual location
         map.flyTo(markers['locMarker'].getLatLng());
 
-        // update score
+        // Update (append) score using the distance between guess and the actual location.
         updateScore(Math.floor(dist));
 
+        // If the player still has more rounds left, show the next round button.
         if (round < MAX_ROUNDS) {
           $('#nextRoundBtn').show();
         } else {
-          // Present final score
+          // Game is finished, present final score.
+          
         }
-
       }
-
     });
 
+    /**
+     * Updates the game's current score, and updates the text which displays it.
+     */ 
     function updateScore(dist) {
       score += dist;
       $('#score').text(score);
     }
 
+    /**
+     * Loads the next round of the current game.
+     */ 
     $('#nextRoundBtn').click(function (e) { 
       e.preventDefault();
 
@@ -233,21 +270,23 @@
 
       map.setView([0, 0], 0);
       
+      $('#nextBtn').removeAttr("disabled");
+      $('#prevBtn').attr("disabled", "true");
 
+      // Call API to get next round
       const fetchPromise = fetch('/api/');
       fetchPromise.then(response => {
         return response.json();
       }).then(pl => {
-
+        
+        // Update references to playlist, etc.
         playlist = pl;
         coords = playlist.coords;
         stories = playlist.stories;
 
-        console.log(playlist);
-
+        // Reset story counter and 
         storyCounter = 0;
         showStory();
-
       });
     });
 

@@ -75,6 +75,9 @@ function getCity() {
   return city;
 }
 
+/**
+ * Deletes a city from the JSON file - TO BE COMPLETED...
+ */
 function deleteCity(city) {
   console.log(cities.filter(function(data) {
     data.id == city.id;
@@ -132,8 +135,10 @@ function processPlaylist(playlist, res, city, onSuccess) {
   playlist.stories = stories;
 
   if (onSuccess == NEW_ROUND) {
+    // Send only the JSON file
     return res.send(playlist); 
   } else if (onSuccess == NEW_GAME) {
+    // Format the page using the JSON file
     return res.render('home', {playlist: JSON.stringify(playlist)});
   } 
 }
@@ -154,4 +159,5 @@ function timeSince(timeStamp) {
   
 }
 
+// Run the web server using Express
 app.listen(3000, () => console.log('The application is running on localhost:3000!'));
