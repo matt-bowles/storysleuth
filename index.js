@@ -2,7 +2,9 @@
 const express = require('express');
 const snapMap = require('snapmap');
 const app = express();
+const fs = require('fs');
 const cities = require('./cities.json');
+const goodCitiesFilename = 'verifiedCities.json';
 
 // Constants
 const RADIUS = 3000;   // in metres
@@ -96,14 +98,18 @@ function processPlaylist(playlist, res, city, onSuccess) {
 
   // Get random stories from playlist
   for (var i=0; i<MIN_STORIES; i++) {
-    var num = [Math.floor(Math.random()*playlist.totalCount)]; 
+
+    // Make sure that the story hasn't already been picked.
+    do {
+      var num = [Math.floor(Math.random()*playlist.totalCount)]; 
+    } while (stories.includes(playlist.elements[num]));
 
     stories.push(playlist.elements[num]);
     // delete playlist.elements[0];
 
     // Get timestamp for each story - How long ago was the story posted?
     try {
-      stories[i].timestamp = timeSince(stories[i].timestamp - stories[i].captureTimestamp);
+      stories[i].timestamp = timeSince(stories[i].timestamp/1000);
     } catch (e) {
       stories[i].timestamp = "Error getting timestamp";
       console.log(e);
@@ -126,7 +132,8 @@ function processPlaylist(playlist, res, city, onSuccess) {
     }
   }
 
-  console.log(city.city + ", " + city.country + " - " + playlist.totalCount + " stories found!"); 
+  console.log(city.city + ", " + city.country + " - " + playlist.totalCount + " stories found!");
+  addCity(city); 
 
   // Initalise playlist object
   playlist = {};
@@ -148,15 +155,40 @@ function processPlaylist(playlist, res, city, onSuccess) {
  * @param {*} timeStamp A unix timestamp
  */
 function timeSince(timeStamp) {
-  var time = (new Date).getTime() - timeStamp;
+  var now = Math.round((new Date()).getTime()/1000);
+  var secondsPast = (now - timeStamp);
+  if(secondsPast < 60){
+    return parseInt(secondsPast) + ' seconds ago';
+  }
+  if(secondsPast < 3600){
+    return parseInt(secondsPast/60) + ' minutes ago';
+  }
+  if(secondsPast <= 86400){
+    return parseInt(secondsPast/3600) + ' hours ago';
+  }
+}
 
-  var minutes = Math.floor(time/60);
+/**
+ * Adds a city to the curated list of verified cities. This should let rounds be loaded quicker.
+ * @param {*} city A city object, containing: city[name], country, lat, lng.
+ */
+function addCity(city) {
 
-  var seconds = time - minutes * 60;
+  var cityData = {
+    city: city.city,
+    country: city.country,
+    lat: city.lat,
+    lng: city.lng
+  };
 
-  return minutes + " minutes and " + seconds + " seconds ago";
-  
-  
+  var data = fs.readFileSync(goodCitiesFilename);
+  var goodCities = JSON.parse(data);
+  if (!goodCities.some(c => (c.lat == city.lat) && (c.lng == city.lng))) {
+    goodCities.push(cityData);
+    fs.writeFileSync(goodCitiesFilename, JSON.stringify(goodCities), function(err) {
+      if (err) throw err;
+    });
+  }
 }
 
 // Run the web server using Express
