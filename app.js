@@ -1,10 +1,12 @@
 // Requirements
-const express = require('express');
-const snapMap = require('snapmap');
-const app = express();
-const fs = require('fs');
-const cities = require('./cities.json');
-const goodCitiesFilename = 'verifiedCities.json';
+var express = require('express');
+var snapMap = require('snapmap');
+var app = express();
+var fs = require('fs');
+var favicon = require('serve-favicon');
+var path = require('path');
+var cities = require('./verifiedCities.json');
+var goodCitiesFilename = 'verifiedCities.json';
 
 // Constants
 const RADIUS = 3000;   // in metres
@@ -17,6 +19,12 @@ const NEW_GAME = "NEW_GAME";
 
 // Set view engine
 app.set('view engine', 'ejs');
+
+// Specify public directory (to serve static files)
+app.use(express.static('public'));
+
+// Use a favicon
+app.use(favicon(path.join(__dirname, 'public', 'img/favicon.ico')));
 
 // API
 app.get('/api/', (req, res) => {
@@ -78,16 +86,6 @@ function getCity() {
 }
 
 /**
- * Deletes a city from the JSON file - TO BE COMPLETED...
- */
-function deleteCity(city) {
-  console.log(cities.filter(function(data) {
-    data.id == city.id;
-  }));
-  
-}
-
-/**
  * 
  * @param {*} playlist  The playlist containing stories.
  * @param {*} res       The response object to be sent back to the client.
@@ -105,7 +103,6 @@ function processPlaylist(playlist, res, city, onSuccess) {
     } while (stories.includes(playlist.elements[num]));
 
     stories.push(playlist.elements[num]);
-    // delete playlist.elements[0];
 
     // Get timestamp for each story - How long ago was the story posted?
     try {

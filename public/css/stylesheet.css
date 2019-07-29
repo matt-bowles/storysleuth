@@ -1,0 +1,22 @@
+#mapid {
+  width: 150%;
+  height: 650px;
+}
+
+#guessResult {
+  margin: auto;
+  width: 50%;
+  margin-bottom: 50px;
+}
+
+#scoreCard {
+  margin-left: 3.5%;
+}
+
+th {
+  text-align: center;
+}
+
+#scoreCard td {
+  width: 50px;
+}

@@ -6,28 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
-  <link href="../stylesheet.css">
+  <link href="/css/stylesheet.css" rel="stylesheet" type="text/css">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
 
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
+  <script type="text/javascript" src="/js/gameFunctions.js"></script>
+
   <title>Where Am I?</title>
 </head>
-
-<style>
-  #mapid {
-    width: 150%;
-    height: 650px;
-  }
-  
-  #guessResult {
-    margin: auto;
-    width: 50%;
-    margin-bottom: 50px;
-  }
-</style>
 
 <body>
 
@@ -52,12 +41,47 @@
         </div>
       </div>
     </nav>
+    
+
 
     <div class="container">
-        <div class="row">Your score is: <span id="score"></span></div>
+        <div class="row">
+
+        </div>
         <div class="row" id="guessResult">
         </div>
         <div class="row">
+          <div class="col-sm-2">
+              <table id="scoreCard" class="table-bordered table-striped table-sm">
+                  <thead class="thead-dark">
+                    <th colspan="2">Score</th>
+                  </thead>
+                  <tr>
+                    <td>R1</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>R2</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>R3</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>R4</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>R5</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>C.S.</td>
+                    <td><span id="score">0</td>
+                  </tr>
+                </table>
+          </div>
           <div class="col-sm">
             <video controls id="video_player">
               <source src="" type="video/mp4">
@@ -66,8 +90,8 @@
             <h3 id="timestamp"><%=stories[0].timestamp%></h3> 
 
             <!-- Story nav buttons -->
-            <button id="prevBtn" onclick="prevStory()" disabled><-- Prev</button>
-            <button id="nextBtn" onclick="nextStory()">Next --></button>
+            <button id="prevBtn" class="btn btn-outline-dark" onclick="prevStory()"><-- Prev</button>
+            <button id="nextBtn" class="btn btn-outline-dark" onclick="nextStory()">Next --></button>
 
           </div>
           <div class="col-lg">
@@ -86,6 +110,7 @@
 </body>
 
   <script>
+    
     let round = 1;
     const MAX_ROUNDS = 5;
 
@@ -100,9 +125,12 @@
     /**************************/ 
 
     // Initalise map
-    var map = L.map('mapid', {
+    var map = L.map('mapid', 
+    {
       worldCopyJump: true,
-    }).setView([0, 0], 0);
+      minZoom: 1.5
+    }
+    ).setView([0, 0], 0);
     var markers = [];
 
     // Add a tileset to the map - very pretty.
@@ -112,21 +140,21 @@
 
     // Define custom icon for actual location.
     var locIcon = L.icon({
-      iconUrl: 'C:/xampp_install/htdocs/whereami/location-icon.png',
-      iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
+      iconUrl: '/img/location-icon.png',
+      iconAnchor:   [10, 15], // point of the icon which will correspond to marker's location,
+      iconSize: [30, 30]
     });
 
 
     /**
      * Initialise the game.
      *    - Show first story in playlist.
-     *    - Initalise player's score (to 0).
      *    - Disable previous button (the player can't play the previous video...).
      *    - Hide the next round button (made visible when player guesses). 
      */
     $(document).ready(function () {
       showStory();
-      updateScore(0);
+      $('#prevBtn').attr("disabled", "true")
       $('#nextRoundBtn').hide();
     });
 
@@ -169,6 +197,15 @@
 
       // Show timestamp.
       $('#timestamp').text(stories[storyCounter].timestamp);
+    }
+
+    /**
+     * Updates the game's current score, and updates the text which displays it.
+     */ 
+     function updateScore(dist) {
+      $(`#scoreCard tr:nth-child(${round}) td:nth-child(2)`).text(dist);
+      score += dist;
+      $('#score').text(score);
     }
 
     /**
@@ -220,7 +257,7 @@
         latlngs.push(markers['locMarker'].getLatLng());
 
         // Draw line between guess and actual location.
-        var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+        var polyline = L.polyline(latlngs, {color: 'black', dashArray: "1 5"}).addTo(map);
 
         // Display guess info - how far off was the player?
         var dist = getDistanceFromLatLonInKm(coords.lat, coords.lng, lat, lon);
@@ -241,14 +278,6 @@
         }
       }
     });
-
-    /**
-     * Updates the game's current score, and updates the text which displays it.
-     */ 
-    function updateScore(dist) {
-      score += dist;
-      $('#score').text(score);
-    }
 
     /**
      * Loads the next round of the current game.
@@ -290,37 +319,7 @@
       });
     });
 
-    function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-    var R = 6371; // Radius of the earth in km
-    var dLat = deg2rad(lat2-lat1);  // deg2rad below
-    var dLon = deg2rad(lon2-lon1); 
-    var a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2); 
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    var d = R * c; // Distance in km
 
-    // Round it up and return
-    return " " + (Math.round(d * 100) / 100) + " ";
-    }
-
-  function deg2rad(deg) {
-    return deg * (Math.PI/180)
-  }
-
-  function clearMap(m) {
-    for(i in m._layers) {
-        if(m._layers[i]._path != undefined) {
-            try {
-                m.removeLayer(m._layers[i]);
-            }
-            catch(e) {
-                console.log("problem with " + e + m._layers[i]);
-            }
-        }
-    }
-}
   </script>
 
 </html>
