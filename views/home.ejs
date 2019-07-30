@@ -83,9 +83,12 @@
                 </table>
           </div>
           <div class="col-sm">
-            <video controls id="video_player">
-              <source src="" type="video/mp4">
-            </video>
+            <div id="media_content">
+              <img id="image_display" src="" alt="This is an image. Good luck">
+              <video controls id="video_player">
+                <source src="" type="video/mp4">
+              </video>
+            </div>
             <!-- Start with default story - no. 0 in json array -->
             <h3 id="timestamp"><%=stories[0].timestamp%></h3> 
 
@@ -189,11 +192,29 @@
     }
 
     /**
-     * Displays a "video" in the video player. Also updates the timestamp value.
+     * Displays a "video" in the video player, or an image in the image displayer.
+     * Also updates the timestamp value.
      */
     function showStory() {
       // Display video.
-      $('#video_player').attr("src", stories[storyCounter].storyURL);
+      var story = stories[storyCounter];
+      var storyURL = story.storyURL;
+
+      if (story.isImage) {
+        // Hide video player
+        $('#video_player').hide();
+
+        // Show image
+        $('#image_display').attr("src", storyURL);
+        $('#image_display').show();
+
+      } else {
+        // Hide image
+        $('#image_display').hide();
+
+        $('#video_player').attr("src", storyURL);
+        $('#video_player').show();
+      }
 
       // Show timestamp.
       $('#timestamp').text(stories[storyCounter].timestamp);

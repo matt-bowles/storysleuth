@@ -5,7 +5,7 @@ var app = express();
 var fs = require('fs');
 var favicon = require('serve-favicon');
 var path = require('path');
-var cities = require('./verifiedCities.json');
+var cities = require('./cities.json');
 var goodCitiesFilename = 'verifiedCities.json';
 
 // Constants
@@ -118,6 +118,7 @@ function processPlaylist(playlist, res, city, onSuccess) {
     if (stories[i].snapInfo.streamingMediaInfo) {
       var suffix = stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl ? stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl : stories[i].snapInfo.streamingMediaInfo.mediaUrl;
       stories[i].storyURL = stories[i].snapInfo.streamingMediaInfo.prefixUrl + suffix;
+      stories[i].isImage = false;
     } 
     
     // It's an image
@@ -180,6 +181,8 @@ function addCity(city) {
 
   var data = fs.readFileSync(goodCitiesFilename);
   var goodCities = JSON.parse(data);
+
+  // If the city is not already saved to the file, then add it.
   if (!goodCities.some(c => (c.lat == city.lat) && (c.lng == city.lng))) {
     goodCities.push(cityData);
     fs.writeFileSync(goodCitiesFilename, JSON.stringify(goodCities), function(err) {

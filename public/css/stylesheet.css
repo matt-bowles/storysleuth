@@ -20,3 +20,8 @@ th {
 #scoreCard td {
   width: 50px;
 }
+
+#media_content img, video {
+  width: 365px;
+  height: 653px;
+}
