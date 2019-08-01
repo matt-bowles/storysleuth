@@ -40,4 +40,4 @@ Thumbs.db
 ############################
 node_modules
 cities.json
-backup
+verifiedCities.json

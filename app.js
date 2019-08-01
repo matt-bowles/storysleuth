@@ -13,9 +13,6 @@ const RADIUS = 3000;   // in metres
 const ZOOM = 2;        // between 2-18
 const MIN_STORIES = 5; // the min. amount of stories a successful playlist must have
 
-// Set view engine
-app.set('view engine', 'ejs');
-
 // Specify public directory (to serve static files)
 app.use(express.static('public'));
 
@@ -29,7 +26,7 @@ app.get('/api/', (req, res) => {
 
 // home route
 app.get('/', (req, res) => {
-  res.render('home');
+  res.sendFile(__dirname+'/views/home.html');
 });
 
 /**
