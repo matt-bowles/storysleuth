@@ -5,17 +5,13 @@ var app = express();
 var fs = require('fs');
 var favicon = require('serve-favicon');
 var path = require('path');
-var cities = require('./cities.json');
+var cities = require('./verifiedCities.json');
 var goodCitiesFilename = 'verifiedCities.json';
 
 // Constants
 const RADIUS = 3000;   // in metres
 const ZOOM = 2;        // between 2-18
 const MIN_STORIES = 5; // the min. amount of stories a successful playlist must have
-
-// Things
-const NEW_ROUND = "NEW_ROUND";
-const NEW_GAME = "NEW_GAME";
 
 // Set view engine
 app.set('view engine', 'ejs');
@@ -28,15 +24,12 @@ app.use(favicon(path.join(__dirname, 'public', 'img/favicon.ico')));
 
 // API
 app.get('/api/', (req, res) => {
-  getStories(res, NEW_ROUND);
+  getStories(res);
 });
 
 // home route
 app.get('/', (req, res) => {
-  console.log();
-
-  // Get stories for a random city
-  getStories(res, NEW_GAME);
+  res.render('home');
 });
 
 /**
@@ -44,24 +37,24 @@ app.get('/', (req, res) => {
  * @param {*} res   The response object that will be sent to the browser
  * @param {*} city  The city for which the stories will be searched for
  */
-function getStories(res, onSuccess) {
+function getStories(res) {
   var city = getCity();
 
   snapMap.getPlaylist(city.lat, city.lng, RADIUS, ZOOM)
     .then((pl) => { 
       console.log(pl.totalCount + " stories found!");
 
-      // If stories exist, an d the playlist contains the min. amount of stories...
+      // If stories exist, and the playlist contains the min. amount of stories...
       if (!isNaN(pl.totalCount) && pl.totalCount >= MIN_STORIES) {
         console.log("Successful city found!");
           // Process the playlist - e.g. get timestamp, URLS, etc.
-          processPlaylist(pl, res, city, onSuccess);
+          processPlaylist(pl, res, city);
       } 
 
       // Not enough stories, find new city
       else {
         console.log("Finding a new city...");
-        getStories(res, onSuccess);
+        getStories(res);
       }
     })
     .catch((error) => {
@@ -80,7 +73,7 @@ function getCity() {
   } 
 
   // No USA mode!
-  while (city.country == "United States");
+  while (city.country === "United States");
   
   return city;
 }
@@ -91,7 +84,7 @@ function getCity() {
  * @param {*} res       The response object to be sent back to the client.
  * @param {*} city      The name of the city 
  */
-function processPlaylist(playlist, res, city, onSuccess) {
+function processPlaylist(playlist, res, city) {
   stories = [];   // Holds MIN_STORIES amount of stories
 
   // Get random stories from playlist
@@ -122,9 +115,7 @@ function processPlaylist(playlist, res, city, onSuccess) {
     } 
     
     // It's an image
-    // TODO: deal with this or something
     else {
-      console.log("It's an image");
       stories[i].storyURL = stories[i].snapInfo.publicMediaInfo.publicImageMediaInfo.mediaUrl;
       stories[i].isImage = true;
     }
@@ -139,13 +130,7 @@ function processPlaylist(playlist, res, city, onSuccess) {
   playlist.coords = {lat: city.lat, lng: city.lng};
   playlist.stories = stories;
 
-  if (onSuccess == NEW_ROUND) {
-    // Send only the JSON file
-    return res.send(playlist); 
-  } else if (onSuccess == NEW_GAME) {
-    // Format the page using the JSON file
-    return res.render('home', {playlist: JSON.stringify(playlist)});
-  } 
+  return res.send(playlist);
 }
 
 /**

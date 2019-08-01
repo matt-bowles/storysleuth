@@ -90,7 +90,7 @@
               </video>
             </div>
             <!-- Start with default story - no. 0 in json array -->
-            <h3 id="timestamp"><%=stories[0].timestamp%></h3> 
+            <h3 id="timestamp"></h3> 
 
             <!-- Story nav buttons -->
             <button id="prevBtn" class="btn btn-outline-dark" onclick="prevStory()"><-- Prev</button>
@@ -106,20 +106,16 @@
       </div>
 
     
-      <!-- Sneakret game info -->
-      <p style="visibility: hidden" id="playlist"><%=playlist%></p>
-
-    
 </body>
 
   <script>
     
-    let round = 1;
+    let round = 0;
     const MAX_ROUNDS = 5;
 
     let score = 0;
     let storyCounter = 0;
-    let playlist = JSON.parse($('#playlist').text());
+    let playlist = {};
     let coords = playlist.coords;
     let stories = playlist.stories;
 
@@ -156,9 +152,8 @@
      *    - Hide the next round button (made visible when player guesses). 
      */
     $(document).ready(function () {
-      showStory();
-      $('#prevBtn').attr("disabled", "true")
-      $('#nextRoundBtn').hide();
+      initaliseNewRound();
+      console.log("Yeet...");
     });
 
     /**
@@ -305,23 +300,28 @@
      */ 
     $('#nextRoundBtn').click(function (e) { 
       e.preventDefault();
+      initaliseNewRound();
+    });
 
+    function initaliseNewRound() {
       $('#nextRoundBtn').hide();
       round++;
       console.log(`Round ${round} out of ${MAX_ROUNDS}`);
 
-      // Fix up the map
-      map.removeLayer(markers['guessMarker']);
-      map.removeLayer(markers['locMarker']);
-      clearMap(map);
-      markers = [];
-      $("#guessButton").attr("disabled", true);
-      $('#guessResult').text(" ");
+      if (round !== 1) {
+        // Fix up the map
+        map.removeLayer(markers['guessMarker']);
+        map.removeLayer(markers['locMarker']);
+        clearMap(map);
+        markers = [];
+        $("#guessButton").attr("disabled", true);
+        $('#guessResult').text(" ");
 
-      map.setView([0, 0], 0);
-      
-      $('#nextBtn').removeAttr("disabled");
-      $('#prevBtn').attr("disabled", "true");
+        map.setView([0, 0], 0);
+        
+        $('#nextBtn').removeAttr("disabled");
+        $('#prevBtn').attr("disabled", "true");
+      }
 
       // Call API to get next round
       const fetchPromise = fetch('/api/');
@@ -338,8 +338,7 @@
         storyCounter = 0;
         showStory();
       });
-    });
-
+    }
 
   </script>
 
