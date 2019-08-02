@@ -5,6 +5,7 @@ var app = express();
 var fs = require('fs');
 var favicon = require('serve-favicon');
 var path = require('path');
+var timeago = require("timeago.js");
 var cities = require('./verifiedCities.json');
 var goodCitiesFilename = 'verifiedCities.json';
 
@@ -92,11 +93,13 @@ function processPlaylist(playlist, res, city) {
       var num = [Math.floor(Math.random()*playlist.totalCount)]; 
     } while (stories.includes(playlist.elements[num]));
 
-    stories.push(playlist.elements[num]);
+    stories.push({});
 
     // Get timestamp for each story - How long ago was the story posted?
     try {
-      stories[i].timestamp = timeSince(stories[i].timestamp/1000);
+      let timestamp = playlist.elements[num].timestamp;
+      timestampInWords = timeago.format(timestamp);
+      stories[i].timestamp = timestampInWords;
     } catch (e) {
       stories[i].timestamp = "Error getting timestamp";
       console.log(e);
@@ -105,15 +108,20 @@ function processPlaylist(playlist, res, city) {
     }
 
     // It's a video
-    if (stories[i].snapInfo.streamingMediaInfo) {
-      var suffix = stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl ? stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl : stories[i].snapInfo.streamingMediaInfo.mediaUrl;
-      stories[i].storyURL = stories[i].snapInfo.streamingMediaInfo.prefixUrl + suffix;
+    if (playlist.elements[num].snapInfo.streamingMediaInfo) {
+      // Find suffix (depending whether there is an overlay or not)
+      var suffix = playlist.elements[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl 
+      ? playlist.elements[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl
+      : playlist.elements[num].snapInfo.streamingMediaInfo.mediaUrl;
+
+      stories[i].storyURL = playlist.elements[num].snapInfo.streamingMediaInfo.prefixUrl + suffix;
+
       stories[i].isImage = false;
     } 
     
     // It's an image
     else {
-      stories[i].storyURL = stories[i].snapInfo.publicMediaInfo.publicImageMediaInfo.mediaUrl;
+      stories[i].storyURL = playlist.elements[num].snapInfo.publicMediaInfo.publicImageMediaInfo.mediaUrl;
       stories[i].isImage = true;
     }
   }
@@ -128,24 +136,6 @@ function processPlaylist(playlist, res, city) {
   playlist.stories = stories;
 
   return res.send(playlist);
-}
-
-/**
- * Converts a unix timestamp into a time string (e.g. 50 minutes ago, 6 hours ago, etc.)
- * @param {*} timeStamp A unix timestamp
- */
-function timeSince(timeStamp) {
-  var now = Math.round((new Date()).getTime()/1000);
-  var secondsPast = (now - timeStamp);
-  if(secondsPast < 60){
-    return parseInt(secondsPast) + ' seconds ago';
-  }
-  if(secondsPast < 3600){
-    return parseInt(secondsPast/60) + ' minutes ago';
-  }
-  if(secondsPast <= 86400){
-    return parseInt(secondsPast/3600) + ' hours ago';
-  }
 }
 
 /**
