@@ -84,6 +84,7 @@ function getCity() {
  */
 function processPlaylist(playlist, res, city) {
   stories = [];   // Holds MIN_STORIES amount of stories
+  story_ids = [];
 
   // Get random stories from playlist
   for (var i=0; i<MIN_STORIES; i++) {
@@ -91,27 +92,22 @@ function processPlaylist(playlist, res, city) {
     // Make sure that the story hasn't already been picked.
     do {
       var num = [Math.floor(Math.random()*playlist.totalCount)]; 
-    } while (stories.includes(playlist.elements[num]));
+    } while (story_ids.includes(playlist.elements[num].id));
 
     stories.push({});
+    story_ids.push(playlist.elements[num].id);
 
     // Get timestamp for each story - How long ago was the story posted?
-    try {
-      let timestamp = playlist.elements[num].timestamp;
-      timestampInWords = timeago.format(timestamp);
-      stories[i].timestamp = timestampInWords;
-    } catch (e) {
-      stories[i].timestamp = "Error getting timestamp";
-      console.log(e);
-      playlist.error = "Timestamp error";
-      return res.send(playlist);
-    }
+    let timestamp = playlist.elements[num].timestamp;
+    stories[i].timestamp = timeago.format(timestamp);
 
     // It's a video
     if (playlist.elements[num].snapInfo.streamingMediaInfo) {
       // Find suffix (depending whether there is an overlay or not)
       var suffix = playlist.elements[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl 
+      // -- video has snapchat overlay --
       ? playlist.elements[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl
+      // -- video doesn't have overlay --
       : playlist.elements[num].snapInfo.streamingMediaInfo.mediaUrl;
 
       stories[i].storyURL = playlist.elements[num].snapInfo.streamingMediaInfo.prefixUrl + suffix;
