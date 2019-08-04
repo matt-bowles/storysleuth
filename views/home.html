@@ -324,7 +324,7 @@
       }
 
       // Call API to get next round
-      const fetchPromise = fetch('/api/');
+      const fetchPromise = fetch('/api/playlist');
       fetchPromise.then(response => {
         return response.json();
       }).then(pl => {

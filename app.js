@@ -5,16 +5,14 @@ var app = express();
 var fs = require('fs');
 var favicon = require('serve-favicon');
 var path = require('path');
+var timeago = require("timeago.js");
 var cities = require('./verifiedCities.json');
 var goodCitiesFilename = 'verifiedCities.json';
 
 // Constants
 const RADIUS = 3000;   // in metres
 const ZOOM = 2;        // between 2-18
-const MIN_STORIES = 5; // the min. amount of stories a successful playlist must have
-
-// Set view engine
-app.set('view engine', 'ejs');
+var numStories = 5; // the min. amount of stories a successful playlist must have
 
 // Specify public directory (to serve static files)
 app.use(express.static('public'));
@@ -23,13 +21,13 @@ app.use(express.static('public'));
 app.use(favicon(path.join(__dirname, 'public', 'img/favicon.ico')));
 
 // API
-app.get('/api/', (req, res) => {
-  getStories(res);
+app.get('/api/playlist', (req, res) => {
+  getStories(res, req.query, 0);
 });
 
 // home route
 app.get('/', (req, res) => {
-  res.render('home');
+  res.sendFile(__dirname+'/views/home.html');
 });
 
 /**
@@ -37,15 +35,24 @@ app.get('/', (req, res) => {
  * @param {*} res   The response object that will be sent to the browser
  * @param {*} city  The city for which the stories will be searched for
  */
-function getStories(res) {
-  var city = getCity();
+function getStories(res, req, timeoutCount) {
+
+  if (!(timeoutCount < 5)) {
+    res.send("Timed out - try again.");
+  }
+
+  var city = getCity(req);
+
+  if (req.numStories && req.numStories > 0 && req.numStories < 100) {
+    numStories = req.numStories;
+  }
 
   snapMap.getPlaylist(city.lat, city.lng, RADIUS, ZOOM)
     .then((pl) => { 
       console.log(pl.totalCount + " stories found!");
 
       // If stories exist, and the playlist contains the min. amount of stories...
-      if (!isNaN(pl.totalCount) && pl.totalCount >= MIN_STORIES) {
+      if (!isNaN(pl.totalCount) && pl.totalCount >= numStories) {
         console.log("Successful city found!");
           // Process the playlist - e.g. get timestamp, URLS, etc.
           processPlaylist(pl, res, city);
@@ -54,7 +61,7 @@ function getStories(res) {
       // Not enough stories, find new city
       else {
         console.log("Finding a new city...");
-        getStories(res);
+        getStories(res, req, ++timeoutCount);
       }
     })
     .catch((error) => {
@@ -65,18 +72,37 @@ function getStories(res) {
 /**
  * Pulls a random city JSON object from cities.json.
  */
-function getCity() {
+function getCity(req) {
+  
+  let i=0;
+  let condition = i>0;
+
+  if (req.include) {
+    var countries = req.include.split(",");
+    var included = countries.map(function(c){ return c.toUpperCase() });
+    condition = "(!included.includes(city.country.toUpperCase()))";
+  }
+
+  else if (req.exclude) {
+    var countries = req.exclude.split(",");
+    var excluded = countries.map(function(c){ return c.toUpperCase() });
+    condition = "(excluded.includes(city.country.toUpperCase()))";
+  }
+
   // Find random city and print it
   do {
     var city = cities[Math.floor(Math.random()*cities.length)];
     console.log(city.city + ", " + city.country);
+
+    i++;
   } 
 
-  // No USA mode!
-  while (city.country === "United States");
   
+  while (eval(condition));
+
   return city;
 }
+
 
 /**
  * 
@@ -85,38 +111,41 @@ function getCity() {
  * @param {*} city      The name of the city 
  */
 function processPlaylist(playlist, res, city) {
-  stories = [];   // Holds MIN_STORIES amount of stories
+  stories = [];   // Holds minStories amount of stories
+  story_ids = [];
 
   // Get random stories from playlist
-  for (var i=0; i<MIN_STORIES; i++) {
+  for (var i=0; i<numStories; i++) {
 
     // Make sure that the story hasn't already been picked.
     do {
       var num = [Math.floor(Math.random()*playlist.totalCount)]; 
-    } while (stories.includes(playlist.elements[num]));
+    } while (story_ids.includes(playlist.elements[num].id));
 
-    stories.push(playlist.elements[num]);
+    stories.push({});
+    story_ids.push(playlist.elements[num].id);
 
     // Get timestamp for each story - How long ago was the story posted?
-    try {
-      stories[i].timestamp = timeSince(stories[i].timestamp/1000);
-    } catch (e) {
-      stories[i].timestamp = "Error getting timestamp";
-      console.log(e);
-      playlist.error = "Timestamp error";
-      return res.send(playlist);
-    }
+    let timestamp = playlist.elements[num].timestamp;
+    stories[i].timestamp = timeago.format(timestamp);
 
     // It's a video
-    if (stories[i].snapInfo.streamingMediaInfo) {
-      var suffix = stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl ? stories[i].snapInfo.streamingMediaInfo.mediaWithOverlayUrl : stories[i].snapInfo.streamingMediaInfo.mediaUrl;
-      stories[i].storyURL = stories[i].snapInfo.streamingMediaInfo.prefixUrl + suffix;
+    if (playlist.elements[num].snapInfo.streamingMediaInfo) {
+      // Find suffix (depending whether there is an overlay or not)
+      var suffix = playlist.elements[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl 
+      // -- video has snapchat overlay --
+      ? playlist.elements[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl
+      // -- video doesn't have overlay --
+      : playlist.elements[num].snapInfo.streamingMediaInfo.mediaUrl;
+
+      stories[i].storyURL = playlist.elements[num].snapInfo.streamingMediaInfo.prefixUrl + suffix;
+
       stories[i].isImage = false;
     } 
     
     // It's an image
     else {
-      stories[i].storyURL = stories[i].snapInfo.publicMediaInfo.publicImageMediaInfo.mediaUrl;
+      stories[i].storyURL = playlist.elements[num].snapInfo.publicMediaInfo.publicImageMediaInfo.mediaUrl;
       stories[i].isImage = true;
     }
   }
@@ -131,24 +160,6 @@ function processPlaylist(playlist, res, city) {
   playlist.stories = stories;
 
   return res.send(playlist);
-}
-
-/**
- * Converts a unix timestamp into a time string (e.g. 50 minutes ago, 6 hours ago, etc.)
- * @param {*} timeStamp A unix timestamp
- */
-function timeSince(timeStamp) {
-  var now = Math.round((new Date()).getTime()/1000);
-  var secondsPast = (now - timeStamp);
-  if(secondsPast < 60){
-    return parseInt(secondsPast) + ' seconds ago';
-  }
-  if(secondsPast < 3600){
-    return parseInt(secondsPast/60) + ' minutes ago';
-  }
-  if(secondsPast <= 86400){
-    return parseInt(secondsPast/3600) + ' hours ago';
-  }
 }
 
 /**
