@@ -9,6 +9,8 @@ The game operates by using custom implementation of the Snapmap API to return a 
 The playlist API can be called through the address of `/api/playlist`.
 
 
+
+
 ### Receive stories for a certain country/countries
 Multiple countries are seperated through a comma (,).
 
@@ -21,6 +23,8 @@ E.g. return a playlist of stories for a random city in Australia:
 E.g. return a playlist of stories for random cities in *both* Australia and Germany:
 
 `/api/playlist?include=australia,germany`
+
+
 
 
 ### Receive stories for a random country/city excluding a certain country/countries
@@ -38,6 +42,8 @@ E.g. return a playlist of stories from a random country and city, *excluding bot
 
 
 Note that use of the `exclude` query overrides the use of the `include` query, given that most of the time you will want to exclude certain countries instead of including them (from personal experience, anyway).
+
+
 
 
 ### Set the number of stories to be returned in a playlist
