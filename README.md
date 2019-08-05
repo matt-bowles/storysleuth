@@ -9,17 +9,17 @@ The game operates by using custom implementation of the Snapmap API to return a 
 The playlist API can be called through the address of `/api/playlist`.
 
 
-### Receive stories for a certain country/countries
+>### Receive stories for a certain country/countries
 >Multiple countries are seperated through a comma (,).
-
-
+>
+>
 >E.g. return a playlist of stories for a random city in Australia:
-
+>
 >`/api/playlist?include=australia`
-
-
+>
+>
 >E.g. return a playlist of stories for random cities in *both* Australia and Germany:
-
+>
 >`/api/playlist?include=australia,germany`
 
 
