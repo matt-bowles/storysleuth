@@ -9,41 +9,41 @@ The game operates by using custom implementation of the Snapmap API to return a 
 The playlist API can be called through the address of `/api/playlist`.
 
 
->### Receive stories for a certain country/countries
->Multiple countries are seperated through a comma (,).
->
->
->E.g. return a playlist of stories for a random city in Australia:
->
->`/api/playlist?include=australia`
->
->
->E.g. return a playlist of stories for random cities in *both* Australia and Germany:
->
->`/api/playlist?include=australia,germany`
+### Receive stories for a certain country/countries
+Multiple countries are seperated through a comma (,).
+
+
+E.g. return a playlist of stories for a random city in Australia:
+
+`/api/playlist?include=australia`
+
+
+E.g. return a playlist of stories for random cities in *both* Australia and Germany:
+
+`/api/playlist?include=australia,germany`
 
 
 ### Receive stories for a random country/city excluding a certain country/countries
->As shown previously, multiple countries are seperated through a comma (,).
+As shown previously, multiple countries are seperated through a comma (,).
 
 
->E.g. return a playlist of stories from a random country and city, *excluding* Mexico:
+E.g. return a playlist of stories from a random country and city, *excluding* Mexico:
 
->`/api/playlist?exclude=mexico`
-
-
->E.g. return a playlist of stories from a random country and city, *excluding both* Mexico and Latvia:
-
->`/api/playlist?exclude=mexico,latvia`
+`/api/playlist?exclude=mexico`
 
 
->Note that use of the `exclude` query overrides the use of the `include` query, given that most of the time you will want to exclude certain >countries instead of including them (from personal experience, anyway).
+E.g. return a playlist of stories from a random country and city, *excluding both* Mexico and Latvia:
+
+`/api/playlist?exclude=mexico,latvia`
+
+
+Note that use of the `exclude` query overrides the use of the `include` query, given that most of the time you will want to exclude certain countries instead of including them (from personal experience, anyway).
 
 
 ### Set the number of stories to be returned in a playlist
->A Snapchat story for a city can  only hold a maximum of 99 stories, so therefore a boundary of 1 - 99 is enforced.
+A Snapchat story for a city can  only hold a maximum of 99 stories, so therefore a boundary of 1 - 99 is enforced.
 
 
->E.g. return a playlist containing 20 stories:
+E.g. return a playlist containing 20 stories:
 
->`/api/playlist?numStories=20`
+`/api/playlist?numStories=20`
