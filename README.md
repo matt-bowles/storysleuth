@@ -1,5 +1,5 @@
 # whereami
-A game akin to [GeoGuessr](https://www.geoguessr.com), but instead of using Google Streetview, it uses Snapchat's Snapmap.
+A game akin to [GeoGuessr](https://www.geoguessr.com), but instead of using Google Streetview, it uses stories from Snapchat's Snapmap feature. The objective of the game is to guess the *general location* of where a set of stories were captured.
 
 
 ## API Usage
