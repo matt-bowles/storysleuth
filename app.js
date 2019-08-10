@@ -9,6 +9,18 @@ var timeago = require("timeago.js");
 var cities = require('./verifiedCities.json');
 var goodCitiesFilename = 'verifiedCities.json';
 
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
+
+Score = require('./models/Score');
+Playlist = require('./models/Playlist');
+
+// Connect to Mongoose
+mongoose.connect('mongodb://localhost:27017/whereami', {useNewUrlParser: true});
+var db = mongoose.connection;
+
 // Constants
 const RADIUS = 3000;   // in metres
 const ZOOM = 2;        // between 2-18
@@ -20,14 +32,34 @@ app.use(express.static('public'));
 // Use a favicon
 app.use(favicon(path.join(__dirname, 'public', 'img/favicon.ico')));
 
+// Home route
+app.get('/', (req, res) => {
+  res.sendFile(__dirname+'/views/home.html');
+});
+
 // API
 app.get('/api/playlist', (req, res) => {
   getStories(res, req.query, 0);
 });
 
-// home route
-app.get('/', (req, res) => {
-  res.sendFile(__dirname+'/views/home.html');
+app.post('/api/score', (req, res) => {
+
+  var score = req.body;
+
+  Score.addScore(score, (err) => {
+    if (err) throw err;
+    console.log("Score added!");
+    res.json(score);
+  });
+});
+
+app.get('/api/score', (req, res) => {
+  
+  Score.getScores((err, scores) => {
+    if (err) throw err;
+    res.json(scores);
+  });
+
 });
 
 /**

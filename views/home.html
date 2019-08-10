@@ -294,6 +294,15 @@
         } else {
           // Game is finished, present final score.
           
+          // Send score to API
+          fetch('/api/score', {
+            method: 'post',
+            headers: {
+              'Accept': 'application/json, text/plain, */*',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({score: score})
+          });
         }
       }
     });
