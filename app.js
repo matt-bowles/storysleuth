@@ -1,10 +1,8 @@
 // Requirements
 var express = require('express');
 var app = express();
-var fs = require('fs');
-var path = require('path');
 var favicon = require('serve-favicon');
-
+var path = require('path');
 
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -13,9 +11,13 @@ app.use(bodyParser.json());
 
 Score = require('./models/Score');
 Playlist = require('./models/Playlist');
+Game = require('./models/Game');
 
 // Connect to Mongoose
-mongoose.connect('mongodb://localhost:27017/whereami', {useNewUrlParser: true});
+mongoose.connect('mongodb://localhost:27017/whereami', {useNewUrlParser: true}, (err) => {
+  if (err) throw err;
+  console.log("Connected to MongoDB database!");
+});
 var db = mongoose.connection;
 
 // Specify public directory (to serve static files)
@@ -50,37 +52,27 @@ app.get('/api/score', (req, res) => {
 
 // Playlist - GET
 app.get('/api/playlist', (req, res) => {
-
   Playlist.getPlaylist(req.query, (playlist) => {
     res.send(playlist);
   });
 });
 
 
-/**
- * Adds a city to the curated list of verified cities. This should let rounds be loaded quicker.
- * @param {*} city A city object, containing: city[name], country, lat, lng.
- */
-function addCity(city) {
+// View game - GET
+app.get('/game/:gameID', (req, res) => {
+  var gameID = req.params.gameID;
+  res.send(gameID);
+});
 
-  var cityData = {
-    city: city.city,
-    country: city.country,
-    lat: city.lat,
-    lng: city.lng
-  };
+// Game - POST
+app.post('api/game/', (req, res) => {
+  Game.addGame(req.body, (err) => {
+    if (err) throw err;
+    console.log("Game added!");
+    res.json(req.body);
+  });
+});
 
-  var data = fs.readFileSync(goodCitiesFilename);
-  var goodCities = JSON.parse(data);
-
-  // If the city is not already saved to the file, then add it.
-  if (!goodCities.some(c => (c.lat == city.lat) && (c.lng == city.lng))) {
-    goodCities.push(cityData);
-    fs.writeFileSync(goodCitiesFilename, JSON.stringify(goodCities), function(err) {
-      if (err) throw err;
-    });
-  }
-}
 
 // Run the web server using Express
 app.listen(3000, () => console.log('The application is running on localhost:3000!'));
