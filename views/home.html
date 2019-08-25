@@ -44,7 +44,7 @@
     
 
 
-    <div class="container">
+    <div class="container" id="gameContainer">
         <div class="row">
 
         </div>
@@ -141,7 +141,6 @@
       iconAnchor:   [10, 15], // point of the icon which will correspond to marker's location,
       iconSize: [30, 30]
     });
-
 
     /**
      * Initialise the game.
@@ -303,6 +302,8 @@
             },
             body: JSON.stringify({score: score})
           });
+
+          $('#gameContainer').prepend("<h1 id='btnPlayAgain' onclick='resetGame()'>Play again?</h1>");
         }
       }
     });
@@ -321,21 +322,7 @@
 
       // Only fix up the map if it has been tampered with (i.e. if it's not the first round).
       if (round !== 1) {
-        map.removeLayer(markers['guessMarker']);
-        map.removeLayer(markers['locMarker']);
-        clearMap(map);
-        markers = [];
-        $("#guessButton").attr("disabled", true);
-        $('#guessResult').text(" ");
-        
-        map.setView([0, 0], 0);
-        
-        // User can initially view the next story, but not the previous.
-        $('#nextBtn').removeAttr("disabled");
-        $('#prevBtn').attr("disabled", "true");
-
-        // Ensures that the first story will be loaded in the round.
-        storyCounter = 0;
+        clearMap();
       }
 
       // If a playlist has already been temporarily loaded, then use it as the primary playlist.
@@ -366,6 +353,56 @@
       }).then(pl => {
         _callback(pl);
       });
+    }
+
+    /**
+     * Resets the game.
+     *  - Resets scoreboard/total score
+     *  - Resets round number
+     *  - Loads a new round
+     */ 
+    function resetGame() {
+
+      // Remove btn
+      $('#btnPlayAgain').remove();
+
+      // Reset scoreboard
+      for (i=1; i<=5; i++) {
+        $(`#scoreCard tr:nth-child(${i}) td:nth-child(2)`).text("");
+      }
+      score = 0;
+      $('#score').text(score);
+      
+      round = 0;
+      playlist = {};
+
+      initaliseNewRound();
+      clearMap();
+    };
+    
+    /**
+     * Removes all markers and lines currently on the map.
+     * Also sets the storyCounter to 0.
+     */ 
+    function clearMap() {
+      map.removeLayer(markers['guessMarker']);
+      map.removeLayer(markers['locMarker']);
+
+      // Remove the line connecting the two markers
+      removeLineFromMap(map);
+      
+      markers = [];
+      $("#guessButton").attr("disabled", true);
+      $('#guessResult').text(" ");
+      
+      map.setView([0, 0], 0);
+      
+      // User can initially view the next story, but not the previous.
+      $('#nextBtn').removeAttr("disabled");
+      $('#prevBtn').attr("disabled", "true");
+
+      // Ensures that the first story will be loaded in the round.
+      storyCounter = 0;
     }
 
   </script>

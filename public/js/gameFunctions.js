@@ -17,7 +17,7 @@ function deg2rad(deg) {
   return deg * (Math.PI/180)
 }
 
-function clearMap(m) {
+function removeLineFromMap(m) {
   for(i in m._layers) {
       if(m._layers[i]._path != undefined) {
           try {

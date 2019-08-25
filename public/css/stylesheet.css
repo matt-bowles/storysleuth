@@ -1,5 +1,5 @@
 #mapid {
-  width: 150%;
+  width: 170%;
   height: 650px;
 }
 
@@ -24,4 +24,9 @@ th {
 #media_content img, video {
   width: 365px;
   height: 653px;
+}
+
+#btnPlayAgain {
+  text-align: center;
+  cursor: pointer;
 }
