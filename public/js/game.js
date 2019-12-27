@@ -107,19 +107,19 @@ function showStory() {
     var storyURL = story.storyURL;
 
     if (story.isImage) {
-    // Hide video player
-    $('#video_player').hide();
+        // Hide video player
+        $('#video_player').hide();
 
-    // Show image
-    $('#image_display').attr("src", storyURL);
-    $('#image_display').show();
+        // Show image
+        $('#image_display').attr("src", storyURL);
+        $('#image_display').show();
 
     } else {
-    // Hide image
-    $('#image_display').hide();
+        // Hide image
+        $('#image_display').hide();
 
-    $('#video_player').attr("src", storyURL);
-    $('#video_player').show();
+        $('#video_player').attr("src", storyURL);
+        $('#video_player').show();
     }
 
     // Show timestamp.
@@ -143,7 +143,7 @@ function showStory() {
  *    - Reposition map to focus on the actual location.
  *    - Display button to load next round _OR_ present the final score.
  */
-function makeGuess(playerGuessLat, playerGuessLon){
+function makeGuess(){
 
     if (!markers['locMarker']) {
 
@@ -157,9 +157,9 @@ function makeGuess(playerGuessLat, playerGuessLon){
 
     // Draw line between guess and actual location.
     var polyline = L.polyline(latlngs, {color: 'black', dashArray: "1 5"}).addTo(map);
-
+    
     // Display guess info - how far off was the player?
-    var dist = getDistanceFromLatLonInKm(playlist.coords.lat, playlist.coords.lng, playerGuessLat, playerGuessLon);
+    var dist = getDistanceFromLatLonInKm(playlist.coords.lat, playlist.coords.lng, playerGuessLat, playerGuessLng);
     $('#guessResult').html(`Your guess was <b> ${dist} km</b> away from the correct location.`);
 
     // Fly to actual location
