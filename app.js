@@ -6,12 +6,15 @@ var path = require('path');
 
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const passwordHash = require('password-hash');
 
 app.use(bodyParser.json());
 
+// Model imports
 Score = require('./models/Score');
 Playlist = require('./models/Playlist');
 Game = require('./models/Game');
+Account = require('./models/Account');
 
 // Connect to Mongoose
 mongoose.connect('mongodb://localhost:27017/whereami', {useNewUrlParser: true}, (err) => {
@@ -65,12 +68,21 @@ app.get('/game/:gameID', (req, res) => {
 });
 
 // Game - POST
-app.post('api/game/', (req, res) => {
+app.post('/api/game/', (req, res) => {
   Game.addGame(req.body, (err) => {
     if (err) throw err;
     console.log("Game added!");
     res.json(req.body);
   });
+});
+
+// Account - POST
+app.post('/signup/', (req, res) => {
+  Account.addAccount(req.query, (err) => {
+    if (err) throw err;
+    console.log("Account registered!");
+  });
+  res.send("Success");
 });
 
 
