@@ -7,8 +7,12 @@ var path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const passwordHash = require('password-hash');
+const exphbs = require('express-handlebars');
 
 app.use(bodyParser.json());
+
+app.engine('handlebars', exphbs());
+app.set('view engine', 'handlebars');
 
 // Model imports
 Score = require('./models/Score');
@@ -31,8 +35,19 @@ app.use(favicon(path.join(__dirname, 'public', 'img/favicon.ico')));
 
 // Home route
 app.get('/', (req, res) => {
-  res.sendFile(__dirname+'/views/home.html');
+  res.render('home');
 });
+
+// High scores route
+app.get('/scores', (req, res) => {
+  
+  var n = 10;
+
+  axios.get(`localhost:3000/scores?n=${n}`).then((res) => {
+    console.log(res);
+    res.render('scores');
+  }).catch((err) => console.log(err));
+})
 
 // Score - POST
 app.post('/api/score', (req, res) => {
@@ -50,7 +65,7 @@ app.get('/api/score', (req, res) => {
   Score.getScores((err, scores) => {
     if (err) throw err;
     res.json(scores);
-  });
+  }, parseInt(req.query.n));
 });
 
 // Playlist - GET
