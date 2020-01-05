@@ -1,0 +1,25 @@
+<h2>Leaderboard</h2>
+
+{{#each this.scores }}
+    <div class="row py-2 border-bottom">
+        <div class="font-weight-bold col-1">
+            <b>{{ incrementByOne @index }}:</b>
+        </div>
+
+        <div class="col-2">
+            <a href="/games/{{game}}">
+                {{ score }} points
+            </a>
+        </div>
+
+        <div class="col font-italic">
+            {{#if account }}
+                <a href="/players/{{ accountid }}">
+                    {{ account }}
+                </a>
+            {{else}}
+                A player
+            {{/if}}
+        </div>
+    </div>
+{{/each}}

@@ -8,10 +8,16 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const passwordHash = require('password-hash');
 const exphbs = require('express-handlebars');
+const helpers = require('handlebars-helpers')();
 
 app.use(bodyParser.json());
 
-app.engine('handlebars', exphbs());
+app.engine('handlebars', exphbs({
+  // Customer helpers
+  helpers: {
+    'incrementByOne': (num) => { num++; return num; }
+  }
+}));
 app.set('view engine', 'handlebars');
 
 // Model imports
@@ -39,14 +45,14 @@ app.get('/', (req, res) => {
 });
 
 // High scores route
-app.get('/scores', (req, res) => {
+app.get('/leaderboard', (req, res) => {
   
-  var n = 10;
+  const n = 10;   // Number of high scores to be retrieved
 
-  axios.get(`localhost:3000/scores?n=${n}`).then((res) => {
-    console.log(res);
-    res.render('scores');
-  }).catch((err) => console.log(err));
+  Score.getScores((err, scores) => {
+    if (err) throw err;
+    res.render('leaderboard', {scores: scores});
+  }, parseInt(req.query.n));
 })
 
 // Score - POST

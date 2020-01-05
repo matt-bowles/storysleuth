@@ -6,7 +6,7 @@ const scoreSchema = mongoose.Schema({
     type: Number,
     required: true
   },
-  user: {
+  account: {
     type: String,
     default: "A player"
   },
@@ -20,7 +20,7 @@ const Score = module.exports = mongoose.model('Score', scoreSchema);
 
 // Get scores
 module.exports.getScores = (callback, limit) => {
-  Score.find(callback).limit(limit);
+  Score.find(callback).limit(limit).sort([['score', 'asc']]);
 }
 
 // Add score
