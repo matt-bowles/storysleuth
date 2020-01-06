@@ -39,9 +39,9 @@ app.use(express.static('public'));
 // Use a favicon
 app.use(favicon(path.join(__dirname, 'public', 'img/favicon.ico')));
 
-// Home route
+// Home route (the "game")
 app.get('/', (req, res) => {
-  res.render('home');
+  res.render('game');
 });
 
 // High scores route

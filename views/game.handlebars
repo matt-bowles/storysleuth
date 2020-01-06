@@ -1,0 +1,59 @@
+
+<div class="row">
+
+</div>
+<div class="row" id="guessResult">
+</div>
+<div class="row">
+  <div class="col-3">
+      <table id="scoreCard" class="table-bordered table-striped table-sm col-10">
+          <thead class="thead-dark">
+            <th colspan="2">Score</th>
+          </thead>
+          <tr>
+            <td>Round 1</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Round 2</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Round 3</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Round 4</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Round 5</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="font-weight-bold">Total score</td>
+            <td><span id="score">0</td>
+          </tr>
+        </table>
+  </div>
+  <div class="col">
+    <div id="media_content">
+      <img id="image_display" src="" alt="This is an image. Good luck">
+      <video controls id="video_player">
+        <source src="" type="video/mp4">
+      </video>
+    </div>
+    <!-- Start with default story - no. 0 in json array -->
+    <h3 id="timestamp"></h3> 
+
+    <!-- Story nav buttons -->
+    <button id="prevBtn" class="btn btn-outline-dark" onclick="prevStory()"><-- Prev</button>
+    <button id="nextBtn" class="btn btn-outline-dark" onclick="nextStory()">Next --></button>
+
+  </div>
+  <div class="col">
+    <div id="mapid"></div>
+    <button type="button" class="btn btn-danger" id="guessButton" onclick="makeGuess()" disabled>Make guess</button>
+    <button type="button" class="btn btn-primary" id="nextRoundBtn" onclick="initaliseNewRound()">Next round</button>
+  </div>
+</div>

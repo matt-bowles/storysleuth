@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css?family=Comfortaa&display=swap');
+
+* {
+  font-family: 'Comfortaa', cursive;
+}
+
 #mapid {
   width: 170%;
   height: 650px;

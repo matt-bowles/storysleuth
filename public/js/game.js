@@ -190,7 +190,7 @@ function makeGuess(){
         body: JSON.stringify({score: score})
         });
 
-        $('#gameContainer').prepend("<h1 id='btnPlayAgain' onclick='resetGame()'>Play again?</h1>");
+        $('#mainContainer').prepend("<h1 id='btnPlayAgain' onclick='resetGame()'>Play again?</h1>");
     }
     }
 };
