@@ -76,8 +76,9 @@ app.get('/api/score', (req, res) => {
 
 // Playlist - GET
 app.get('/api/playlist', (req, res) => {
-  Playlist.getPlaylist(req.query, (playlist) => {
-    res.send(playlist);
+  console.log()
+  Playlist.getPlaylist(req.query, 0).then((pl) => {
+    res.send(pl);
   });
 });
 
