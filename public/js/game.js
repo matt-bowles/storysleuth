@@ -2,8 +2,7 @@ let round = 0;
 let score = 0;
 let storyCounter = 0;
 let playlist = {};
-
-let tempPlaylist = null;  // Temporarily stores a playlist, without overwriting the current one.
+let game = [];
 
 var markers = [];
 var locIcon;
@@ -40,7 +39,7 @@ $(document).ready(function () {
         placeGuessMarker();
     });
 
-    initaliseNewRound();
+    initaliseNewGame();
 });
 
 /**
@@ -171,12 +170,6 @@ function makeGuess(){
     // If the player still has more rounds left, show the next round button.
     if (round < playlist.stories.length) {
         $('#nextRoundBtn').show();
-
-        // Load the playlist to be used for the next round, and store it in temp.
-        loadNewPlaylist((pl) => {
-        tempPlaylist = pl;
-        })
-
     } else {
         // Game is finished, present final score.
         
@@ -197,38 +190,26 @@ function makeGuess(){
 
 function initaliseNewRound() {
     $('#nextRoundBtn').hide();
-    round++;
+
+    playlist = game[round];
+    showStory();
 
     // Only fix up the map if it has been tampered with (i.e. if it's not the first round).
-    if (round !== 1) {
+    if (round  !== 0) {
         clearMap();
     }
 
-    // If a playlist has already been temporarily loaded, then use it as the primary playlist.
-    // ... and clear temp.
-    if (tempPlaylist !== null) {
-        playlist = tempPlaylist;
-        tempPlaylist = null;
-        showStory();
-    } 
-    else {
-        loadNewPlaylist((pl) => {
-            playlist = pl;
-            showStory();
-        });
-    }
+    round++;
 }
 
-/**
- * Calls the API to receieve a new playlist. 
- * The user decides what to do with this playlist using a callback parameter when calling the function.
- */ 
-function loadNewPlaylist(_callback) {
-    // Call API to get next round
-    const fetchPromise = fetch('/api/playlist');
-    fetchPromise.then(response => {
-        return response.json();
-    }).then(pl => { _callback(pl) });
+function initaliseNewGame() {
+    // Load new game
+    axios.get('/api/game').then((g) => {
+        game = g.data;
+
+        // Initialise new round
+        initaliseNewRound();
+    });
 }
 
 /**
@@ -249,9 +230,10 @@ function resetGame() {
     $('#score').text(score);
     
     round = 0;
+    game = [];
     playlist = {};
 
-    initaliseNewRound();
+    initaliseNewGame();
     clearMap();
 };
 
