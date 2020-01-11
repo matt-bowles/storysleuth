@@ -44,19 +44,6 @@ app.get('/', (req, res) => {
   res.render('game');
 });
 
-app.get('/api/game', (req, res) => {
-  var promises = []; 
-
-  for (i=0; i<5; i++) {
-    promises.push(Playlist.getPlaylist(req.query, 0));
-  }
-
-  Promise.all(promises).then((game) => {
-    res.send(game);
-  })
-});
-
-
 // High scores route
 app.get('/leaderboard', (req, res) => {
   
@@ -99,6 +86,12 @@ app.get('/api/playlist', (req, res) => {
   });
 });
 
+// Generate new game - GET
+app.get('/api/game', (req, res) => {
+  Game.generateGame(req).then((game) => {
+    res.send(game);
+  })
+});
 
 // View game - GET
 app.get('/game/:gameID', (req, res) => {
