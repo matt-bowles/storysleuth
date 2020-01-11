@@ -44,6 +44,19 @@ app.get('/', (req, res) => {
   res.render('game');
 });
 
+app.get('/api/game', (req, res) => {
+  var promises = []; 
+
+  for (i=0; i<5; i++) {
+    promises.push(Playlist.getPlaylist(req.query, 0));
+  }
+
+  Promise.all(promises).then((game) => {
+    res.send(game);
+  })
+});
+
+
 // High scores route
 app.get('/leaderboard', (req, res) => {
   
@@ -79,6 +92,10 @@ app.get('/api/playlist', (req, res) => {
   console.log()
   Playlist.getPlaylist(req.query, 0).then((pl) => {
     res.send(pl);
+  })
+  
+  .catch((err) => {
+    res.send(err);
   });
 });
 

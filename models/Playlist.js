@@ -19,10 +19,18 @@ var numStories = 5;     // the min. amount of stories a successful playlist must
  * Returns a playlist contains zero or many 'stories' for a given city
  * @param {*} city  The city for which the stories will be searched for
  */
-module.exports.getPlaylist = (req, timeoutCount, re) => {
+module.exports.getPlaylist = (req, timeoutCount, re, rj) => {
   return new Promise(function(resolve, reject){
+
+    // If the original promise is being *passed down*, use that instead
+    if (re !== undefined) resolve = re;
+
+    if (rj !== undefined) reject = rj
+
+
     if (!(timeoutCount < 5)) {
       reject("Timed out - try again.");
+      return;
     }
   
     getCity(req).then((city) => {
@@ -32,28 +40,27 @@ module.exports.getPlaylist = (req, timeoutCount, re) => {
     
       snapMap.getPlaylist(city.lat, city.lng, RADIUS, ZOOM)
         .then((pl) => { 
-          console.log(pl.totalCount + " stories found!");
+          console.log(city.city + ", " + city.country + " - " + pl.totalCount + " stories found!");
     
           // If stories exist, and the playlist contains the min. amount of stories...
           if (!isNaN(pl.totalCount) && pl.totalCount >= numStories) {
-            console.log("Successful city found!");
+            // console.log("Successful city found!");
               // Process the playlist - e.g. get timestamp, URLS, etc.
               processPlaylist(pl, city).then((pl) => {
-
-                // If the original promise is being *passed down*, use that instead
-                if (re) resolve = re;
                 resolve(pl);
-
               });
           } 
     
           // Not enough stories, find new city
           else {
-            console.log("Finding a new city...");
+            // console.log("Finding a new city...");
 
             // Re-call the function, pass the original promise-resolve down
             // (this is so that the original promise request is answered)
-            module.exports.getPlaylist(req, ++timeoutCount, resolve);
+            module.exports.getPlaylist(req, ++timeoutCount, resolve, reject)
+            .catch((err) => {
+              reject(err)
+            });
           }
         })
         .catch((err) => { console.log(err) });
@@ -85,7 +92,7 @@ function getCity(req) {
     // Find random city and print it
     do {
       var city = cities[Math.floor(Math.random()*cities.length)];
-      console.log(city.city + ", " + city.country);
+      // console.log(city.city + ", " + city.country);
   
       i++;
     } 
@@ -144,7 +151,7 @@ function processPlaylist(playlist, city, _callback) {
       }
     }
   
-    console.log(city.city + ", " + city.country + " - " + playlist.totalCount + " stories found!");
+    // console.log(city.city + ", " + city.country + " - " + playlist.totalCount + " stories found!");
     addCity(city); 
   
     // Initalise playlist object
