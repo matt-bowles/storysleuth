@@ -53,3 +53,7 @@ A Snapchat story for a city can  only hold a maximum of 99 stories, so therefore
 E.g. return a playlist containing 20 stories:
 
 `/api/playlist?numStories=20`
+
+### NEW - get a "game" of playlists (currently a game consists of 5 playlists)
+
+`/api/game`
