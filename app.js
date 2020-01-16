@@ -9,8 +9,21 @@ const bodyParser = require('body-parser');
 const passwordHash = require('password-hash');
 const exphbs = require('express-handlebars');
 const helpers = require('handlebars-helpers')();
+const bcrypt = require('bcrypt-nodejs');
+const passport = require('passport');
+const flash = require('express-flash');
+const session = require('express-session');
+const inititalisePassport = require('./config/passport');
+
+inititalisePassport(passport);
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(flash());
+app.use(session({ secret: "sneakret", resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.engine('handlebars', exphbs({
   // Customer helpers
@@ -42,6 +55,33 @@ app.use(favicon(path.join(__dirname, 'public', 'img/favicon.ico')));
 // Home route (the "game")
 app.get('/', (req, res) => {
   res.render('game');
+});
+
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+app.post('/login', passport.authenticate('local', {
+  success: '/',
+  failureRedirect: '/login',
+  failureFlash: true
+}));
+
+app.get('/signup', (req, res) => {
+  res.render('signup');
+});
+
+app.post('/signup', async (req, res) => {
+  try {
+    const hashedpw = await bcrypt.hash(req.body.password, 10);
+    
+    // Register account in db
+
+    // Lopin success
+    res.redirect('/');
+  } catch {
+    res.redirect('/signup');
+  }
 });
 
 // High scores route

@@ -19,6 +19,10 @@
     <script type="text/javascript" src="js/game.js"></script>
 </head>
 <body>
+    {{#if messages.error }}
+        <h1>{{ messages.error }}</h1>
+    {{/if}}
+
     {{>navbar}}
     <div class="container" id="mainContainer">
         {{{body}}}
