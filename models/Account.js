@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 
 // Account schema
@@ -32,7 +33,10 @@ module.exports.getAccounts = (callback, limit) => {
 
 // Add account
 module.exports.addAccount = (account, callback) => {
-  // Hash password here
-
-  Account.create({ username: account.username, password: account.password, email: account.email }, callback);
+  // Hash password and save account to database
+  bcrypt.genSalt(10, (err, salt) => {
+    bcrypt.hash(account.password, salt, (err, hash) => {
+      Account.create({ username: account.username, password: hash,email: account.email }, callback);
+    })
+  });
 }

@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 const passwordHash = require('password-hash');
 const exphbs = require('express-handlebars');
 const helpers = require('handlebars-helpers')();
-const bcrypt = require('bcrypt-nodejs');
+const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const flash = require('express-flash');
 const session = require('express-session');
@@ -71,17 +71,13 @@ app.get('/signup', (req, res) => {
   res.render('signup');
 });
 
-app.post('/signup', async (req, res) => {
-  try {
-    const hashedpw = await bcrypt.hash(req.body.password, 10);
-    
-    // Register account in db
-
-    // Lopin success
-    res.redirect('/');
-  } catch {
-    res.redirect('/signup');
-  }
+// Account - POST
+app.post('/signup/', (req, res) => {
+  Account.addAccount(req.body, (err) => {
+    if (err) throw err;
+    console.log("Account registered!");
+  });
+  res.send("Success");
 });
 
 // High scores route
@@ -146,15 +142,6 @@ app.post('/api/game/', (req, res) => {
     console.log("Game added!");
     res.json(req.body);
   });
-});
-
-// Account - POST
-app.post('/signup/', (req, res) => {
-  Account.addAccount(req.query, (err) => {
-    if (err) throw err;
-    console.log("Account registered!");
-  });
-  res.send("Success");
 });
 
 
