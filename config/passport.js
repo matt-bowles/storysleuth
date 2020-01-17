@@ -17,16 +17,18 @@ function inititalisePassport(passport) {
         if (!acc) return done(null, false, { message: "Username invalid"} );
         
         // Check if password matches  
-        return bcrypt.compare(password, acc.password) ?
+        bcrypt.compare(password, acc.password, (err, res) => {
+          res ?
           done(null, acc) :
           done(null, false, { message: "Password incorrect" });
+        });
 
       });
     }
   ));
 
-  // passport.serializeUser((acc, done) => done(null, acc.id));
-  // passport.deserializeUser((id, done) => { });
+  passport.serializeUser((acc, done) => done(null, acc));
+  passport.deserializeUser((acc, done) => { done(null, acc) });
 }
 
 module.exports = inititalisePassport;
