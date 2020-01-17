@@ -1,11 +1,17 @@
 const mongoose = require('mongoose');
 
+
 // Account schema
 const accountSchema = mongoose.Schema({
-  account: {
+  username: {
     type: String,
     unique: true,
     required: true
+  },
+  email: {
+    type: String,
+    unique: true,
+    required: false
   },
   password: {
       type: String,
@@ -26,6 +32,7 @@ module.exports.getAccounts = (callback, limit) => {
 
 // Add account
 module.exports.addAccount = (account, callback) => {
-    console.log(account);
-  Account.create({account: account.account, password: account.password}, callback);
+  // Hash password here
+
+  Account.create({ username: account.username, password: account.password, email: account.email }, callback);
 }
