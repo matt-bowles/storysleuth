@@ -54,10 +54,11 @@ app.use(favicon(path.join(__dirname, 'public', 'img/favicon.ico')));
 
 // Home route (the "game")
 app.get('/', (req, res) => {
-  res.render('game');
+  res.render('game', getSessionInfo(req));
 });
 
 app.get('/login', (req, res) => {
+  if (req.isAuthenticated()) return res.redirect('/');
   res.render('login');
 });
 
@@ -67,8 +68,14 @@ app.post('/login', passport.authenticate('local', {
   failureFlash: true
 }));
 
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
 app.get('/signup', (req, res) => {
-  res.render('signup');
+  if (req.isAuthenticated()) return res.redirect('/');
+  res.render('signup', getSessionInfo(req));
 });
 
 // Account - POST
@@ -77,7 +84,7 @@ app.post('/signup/', (req, res) => {
     if (err) throw err;
     console.log("Account registered!");
   });
-  res.send("Success");
+  res.send("Success", getSessionInfo(req));
 });
 
 // High scores route
@@ -144,6 +151,11 @@ app.post('/api/game/', (req, res) => {
   });
 });
 
+function getSessionInfo(req) {
+  return {
+    isLoggedIn: req.isAuthenticated(),
+  }
+}
 
 // Run the web server using Express
 app.listen(3000, () => console.log('The application is running on localhost:3000!'));
