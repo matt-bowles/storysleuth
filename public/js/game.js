@@ -178,6 +178,9 @@ function makeGuess(){
     } else {
         // Game is finished, present final score.
         
+        // Show all locations on map
+        drawGameSummary();
+
         // Send score to API
         fetch('/api/score', {
         method: 'post',
@@ -192,6 +195,34 @@ function makeGuess(){
     }
     }
 };
+
+/**
+ * Draws a line between each round location and the coordinates of the corresponding user guess.
+ * To be called at the end of a game, when all rounds are finished.
+ */
+function drawGameSummary() {
+    var allLocations = [];  // Contains the coords of all rounds, as well as the user's guess coords
+
+    // Populate the allLocations array
+    for (var i = 0; i < game.length; i++) {
+        allLocations.push({ guessLoc: { lat: roundGuesses[i].guessLat, lng: roundGuesses[i].guessLng }, actualLoc: game[i].coords });
+    }
+
+    // Draw points between each actual/guess coords
+    allLocations.forEach((e) => {
+        // Add actual location marker to map
+        var actualLocMarker = L.marker([e.actualLoc.lat, e.actualLoc.lng], { icon: locIcon }).addTo(map);
+        var guessLocMarker = L.marker([e.guessLoc.lat, e.guessLoc.lng]).addTo(map);
+
+        var latlngs = Array(); // Contains both the lat/lng positions of the guess and actual location.
+
+        latlngs.push(actualLocMarker.getLatLng());
+        latlngs.push(guessLocMarker.getLatLng());
+
+        // Draw line between all guess and actual locations.
+        L.polyline(latlngs, { color: 'black', dashArray: "1 5" }).addTo(map);
+    });
+}
 
 function initaliseNewRound() {
     $('#nextRoundBtn').hide();
