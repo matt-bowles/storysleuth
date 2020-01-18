@@ -7,8 +7,9 @@ const scoreSchema = mongoose.Schema({
     required: true
   },
   account: {
-    type: String,
-    default: "A player"
+    type: mongoose.Schema.Types.ObjectId,
+    default: null,
+    ref: "Account"
   },
   create_date: {
     type: Date,
@@ -24,6 +25,9 @@ module.exports.getScores = (callback, limit) => {
 }
 
 // Add score
-module.exports.addScore = (score, callback) => {
-  Score.create({score: score.score, user: score.user}, callback);
+module.exports.addScore = (req, callback) => {
+  var accId = (req.isAuthenticated()) ? req.user._id : null;
+  score = req.body;
+
+  Score.create({score: score.score, account: accId}, callback);
 }

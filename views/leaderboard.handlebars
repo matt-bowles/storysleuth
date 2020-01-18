@@ -14,8 +14,8 @@
 
         <div class="col font-italic">
             {{#if account }}
-                <a href="/players/{{ accountid }}">
-                    {{ account }}
+                <a href="/players/{{ account.id }}">
+                    {{ account.username }}
                 </a>
             {{else}}
                 A player

@@ -92,19 +92,18 @@ app.get('/leaderboard', (req, res) => {
   
   const n = 10;   // Number of high scores to be retrieved
 
-  Score.getScores((err, scores) => {
+  Score.find().populate('account', 'username').then((scores, err) => {
     if (err) throw err;
     res.render('leaderboard', {scores: scores});
   }, parseInt(req.query.n));
-})
+});
 
 // Score - POST
 app.post('/api/score', (req, res) => {
 
-  Score.addScore(req.body, (err) => {
+  Score.addScore(req, (err) => {
     if (err) throw err;
-    console.log("Score added!");
-    res.json(req.body);
+    res.sendStatus(200);
   });
 });
 
