@@ -14,6 +14,8 @@ var playerGuessLng;
 var roundGuesses = [];    // Stores the guessed location and score for each round 
 var gameId;     // The generated ID for the current game being played
 
+var allMarkers = [];
+
 /**
  * Initialise the game.
  *    - Define map object and set-up map events.
@@ -214,6 +216,9 @@ function drawGameSummary() {
         var actualLocMarker = L.marker([e.actualLoc.lat, e.actualLoc.lng], { icon: locIcon }).addTo(map);
         var guessLocMarker = L.marker([e.guessLoc.lat, e.guessLoc.lng]).addTo(map);
 
+        allMarkers.push(actualLocMarker);
+        allMarkers.push(guessLocMarker);
+
         var latlngs = Array(); // Contains both the lat/lng positions of the guess and actual location.
 
         latlngs.push(actualLocMarker.getLatLng());
@@ -281,6 +286,11 @@ function resetGame() {
 function clearMap() {
     map.removeLayer(markers['guessMarker']);
     map.removeLayer(markers['locMarker']);
+
+    allMarkers.forEach((marker) => {
+        map.removeLayer(marker);
+    })
+    
 
     // Remove the line connecting the two markers
     removeLineFromMap(map);
