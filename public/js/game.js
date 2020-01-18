@@ -1,6 +1,6 @@
-let round = 0;
-let score = 0;          //
-let storyCounter = 0;   // The  
+let round = 0;          // The index of the current round
+let score = 0;          // The cumulative score of the current game
+let storyCounter = 0;   // The index of the story being displayed in the playlist  
 let playlist = {};      // Holds the stories for the current playlist/round
 let game = [];          // Holds all the rounds for the game
 
@@ -11,8 +11,8 @@ var map;
 var playerGuessLat;
 var playerGuessLng;
 
-var roundGuesses = [];    // Stores the guessed location and score for each round 
-var gameId;     // The generated ID for the current game being played
+var roundGuesses = [];  // Stores the guessed location and score for each round 
+var gameId;             // The generated ID for the current game being played
 
 var allMarkers = [];
 
@@ -41,7 +41,7 @@ $(document).ready(function () {
     map.on('click', function(e) {
         playerGuessLat = e.latlng.lat;
         playerGuessLng = e.latlng.lng;
-        placeGuessMarker();
+        placeGuessMarker(playerGuessLat, playerGuessLng);
     });
 
     initaliseNewGame();
@@ -53,7 +53,7 @@ $(document).ready(function () {
  *    - Add guess marker to where the player clicked.
  *    - Allow the guess to be made (enable guess button).
  */
-function placeGuessMarker() {
+function placeGuessMarker(lat, lng) {
     if (!markers['locMarker']) {
         
         // Remove guess marker if it has already been placed
@@ -62,7 +62,7 @@ function placeGuessMarker() {
         };
 
         // Add marker
-        markers['guessMarker'] = L.marker([playerGuessLat, playerGuessLng]).addTo(map);
+        markers['guessMarker'] = L.marker([lat, lng]).addTo(map);
 
         // Allow user to make guess
         $('#guessButton').attr("disabled", false);
@@ -95,9 +95,9 @@ function prevStory() {
     showStory();
 
     $('#nextBtn').removeAttr("disabled");
-    if (storyCounter == 0) {
-        $('#prevBtn').attr("disabled", "true");
-    }
+        if (storyCounter == 0) {
+            $('#prevBtn').attr("disabled", "true");
+        }
     }
 }
 
@@ -150,83 +150,74 @@ function showStory() {
 function makeGuess(){
 
     if (!markers['locMarker']) {
+        // Add location marker to map
+        markers['locMarker'] = L.marker([playlist.coords.lat, playlist.coords.lng], {icon: locIcon}).addTo(map);
 
-    // Add location marker to map
-    markers['locMarker'] = L.marker([playlist.coords.lat, playlist.coords.lng], {icon: locIcon}).addTo(map);
-
-    var latlngs = Array();  // Contains both the lat/lng positions of the guess and actual location.
-
-    latlngs.push(markers['guessMarker'].getLatLng());
-    latlngs.push(markers['locMarker'].getLatLng());
-
-    // Draw line between guess and actual location.
-    var polyline = L.polyline(latlngs, {color: 'black', dashArray: "1 5"}).addTo(map);
-    
-    // Display guess info - how far off was the player?
-    var dist = getDistanceFromLatLonInKm(playlist.coords.lat, playlist.coords.lng, playerGuessLat, playerGuessLng);
-    $('#guessResult').html(`Your guess was <b> ${dist} km</b> away from the correct location.`);
-
-    // Fly to actual location
-    map.flyTo(markers['locMarker'].getLatLng());
-
-    // Update (append) score using the distance between guess and the actual location.
-    updateScore(Math.floor(dist));
-    
-    roundGuesses.push({roundScore: Math.floor(dist), guessLat: playerGuessLat, guessLng: playerGuessLng});
-
-    // If the player still has more rounds left, show the next round button.
-    if (round < playlist.stories.length) {
-        $('#nextRoundBtn').show();
-    } else {
-        // Game is finished, present final score.
+        lineBetweenTwoMarkers(markers['guessMarker'], markers['locMarker']);
         
-        // Show all locations on map
-        drawGameSummary();
+        // Display guess info - how far off was the player?
+        var dist = getDistanceFromLatLonInKm(playlist.coords.lat, playlist.coords.lng, playerGuessLat, playerGuessLng);
+        $('#guessResult').html(`Your guess was <b> ${dist} km</b> away from the correct location.`);
 
-        // Send score to API
-        fetch('/api/score', {
-        method: 'post',
-        headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({score: score, roundScores: roundGuesses, gameId: gameId})
-        });
+        // Fly to actual location
+        map.flyTo(markers['locMarker'].getLatLng());
 
-        $('#mainContainer').prepend("<h1 id='btnPlayAgain' onclick='resetGame()'>Play again?</h1>");
+        // Update (append) score using the distance between guess and the actual location.
+        updateScore(Math.floor(dist));
+        
+        // Save round score and play guess coordinates.
+        // (so that they can be submitted to the API when the game finishes)
+        roundGuesses.push({roundScore: Math.floor(dist), guessLat: playerGuessLat, guessLng: playerGuessLng});
+
+        // If the player still has more rounds left, show the next round button.
+        if (round < playlist.stories.length) {
+            $('#nextRoundBtn').show();
+        } else {
+            // Game is finished, present final score.
+            
+            // Show all locations on map
+            drawGameSummary();
+
+            // Send score to API
+            fetch('/api/score', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({score: score, roundScores: roundGuesses, gameId: gameId})
+            });
+
+            $('#mainContainer').prepend("<h1 id='btnPlayAgain' onclick='resetGame()'>Play again?</h1>");
+        }
     }
-    }
-};
+}
+
+/**
+ * Draws a dashed black line between 2 markers, and then adds it to the map
+ * @param {*} m1 
+ * @param {*} m2 
+ */
+function lineBetweenTwoMarkers(m1, m2) {
+    L.polyline([m1.getLatLng(), m2.getLatLng()], {color: 'black', dashArray: "1 5"}).addTo(map);
+}
 
 /**
  * Draws a line between each round location and the coordinates of the corresponding user guess.
  * To be called at the end of a game, when all rounds are finished.
  */
 function drawGameSummary() {
-    var allLocations = [];  // Contains the coords of all rounds, as well as the user's guess coords
-
-    // Populate the allLocations array
     for (var i = 0; i < game.length; i++) {
-        allLocations.push({ guessLoc: { lat: roundGuesses[i].guessLat, lng: roundGuesses[i].guessLng }, actualLoc: game[i].coords });
-    }
-
-    // Draw points between each actual/guess coords
-    allLocations.forEach((e) => {
-        // Add actual location marker to map
-        var actualLocMarker = L.marker([e.actualLoc.lat, e.actualLoc.lng], { icon: locIcon }).addTo(map);
-        var guessLocMarker = L.marker([e.guessLoc.lat, e.guessLoc.lng]).addTo(map);
+        // Add locations to map
+        var actualLocMarker = L.marker([game[i].coords.lat, game[i].coords.lng], { icon: locIcon }).addTo(map);
+        var guessLocMarker = L.marker([roundGuesses[i].guessLat, roundGuesses[i].guessLng]).addTo(map);
 
         allMarkers.push(actualLocMarker);
         allMarkers.push(guessLocMarker);
 
-        var latlngs = Array(); // Contains both the lat/lng positions of the guess and actual location.
-
-        latlngs.push(actualLocMarker.getLatLng());
-        latlngs.push(guessLocMarker.getLatLng());
-
-        // Draw line between all guess and actual locations.
-        L.polyline(latlngs, { color: 'black', dashArray: "1 5" }).addTo(map);
-    });
+        // Draw points between each actual/guess coords
+        lineBetweenTwoMarkers(actualLocMarker, guessLocMarker);
+    }
 }
 
 function initaliseNewRound() {
@@ -236,13 +227,17 @@ function initaliseNewRound() {
     showStory();
 
     // Only fix up the map if it has been tampered with (i.e. if it's not the first round).
-    if (round  !== 0) {
+    if (round !== 0) {
         clearMap();
     }
 
     round++;
 }
 
+/**
+ * Calls the API for 'n' new playlists.
+ * (where n is 5 by default)
+ */
 function initaliseNewGame() {
     $('#nextRoundBtn').hide();
 
