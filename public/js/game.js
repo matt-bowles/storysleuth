@@ -1,8 +1,8 @@
 let round = 0;
-let score = 0;
-let storyCounter = 0;
-let playlist = {};
-let game = [];
+let score = 0;          //
+let storyCounter = 0;   // The  
+let playlist = {};      // Holds the stories for the current playlist/round
+let game = [];          // Holds all the rounds for the game
 
 var markers = [];
 var locIcon;
@@ -10,6 +10,9 @@ var map;
 
 var playerGuessLat;
 var playerGuessLng;
+
+var roundGuesses = [];    // Stores the guessed location and score for each round 
+var gameId;     // The generated ID for the current game being played
 
 /**
  * Initialise the game.
@@ -166,6 +169,8 @@ function makeGuess(){
 
     // Update (append) score using the distance between guess and the actual location.
     updateScore(Math.floor(dist));
+    
+    roundGuesses.push({roundScore: Math.floor(dist), guessLat: playerGuessLat, guessLng: playerGuessLng});
 
     // If the player still has more rounds left, show the next round button.
     if (round < playlist.stories.length) {
@@ -180,7 +185,7 @@ function makeGuess(){
             'Accept': 'application/json, text/plain, */*',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({score: score})
+        body: JSON.stringify({score: score, roundScores: roundGuesses, gameId: gameId})
         });
 
         $('#mainContainer').prepend("<h1 id='btnPlayAgain' onclick='resetGame()'>Play again?</h1>");
@@ -203,11 +208,12 @@ function initaliseNewRound() {
 }
 
 function initaliseNewGame() {
+    $('#nextRoundBtn').hide();
+
     // Load new game
     axios.get('/api/game').then((g) => {
-        game = g.data;
-
-        // Initialise new round
+        game = g.data.rounds;
+        gameId = g.data._id;
         initaliseNewRound();
     });
 }
