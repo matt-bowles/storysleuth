@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css?family=Comfortaa&display=swap');
+/* @import url('https://fonts.googleapis.com/css?family=Comfortaa&display=swap'); */
 
 * {
-  font-family: 'Comfortaa', cursive;
+  font-family: 'Comfortaa', Arial, Helvetica, sans-serif;
 }
 
 #mapid {
