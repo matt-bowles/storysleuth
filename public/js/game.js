@@ -44,6 +44,8 @@ $(document).ready(function () {
         placeGuessMarker(playerGuessLat, playerGuessLng);
     });
 
+    map.addControl(new L.Control.Fullscreen());
+
     initaliseNewGame();
 });
 
@@ -106,23 +108,21 @@ function prevStory() {
  * Also updates the timestamp value.
  */
 function showStory() {
-    // Display video.
     var story = playlist.stories[storyCounter];
-    var storyURL = story.storyURL;
 
     if (story.isImage) {
         // Hide video player
         $('#video_player').hide();
 
         // Show image
-        $('#image_display').attr("src", storyURL);
+        $('#image_display').attr("src", story.storyURL);
         $('#image_display').show();
 
     } else {
         // Hide image
         $('#image_display').hide();
 
-        $('#video_player').attr("src", storyURL);
+        $('#video_player').attr("src", story.storyURL);
         $('#video_player').show();
     }
 
@@ -177,6 +177,9 @@ function makeGuess(){
             
             // Show all locations on map
             drawGameSummary();
+
+            // Yeah
+
 
             // Send score to API
             fetch('/api/score', {
