@@ -7,12 +7,13 @@
         </div>
 
         <div class="col-2">
+            {{!-- {{this}} --}}
             <a href="/games/{{game}}">
                 {{ score }} points
             </a>
         </div>
 
-        <div class="col font-italic">
+        <div class="col-2 font-italic">
             {{#if account }}
                 <a href="/players/{{ account.id }}">
                     {{ account.username }}
@@ -20,6 +21,10 @@
             {{else}}
                 A player
             {{/if}}
+        </div>
+
+        <div class="col">
+            {{ formatDate create_date }}
         </div>
     </div>
 {{/each}}

@@ -10,6 +10,7 @@ const passwordHash = require('password-hash');
 const exphbs = require('express-handlebars');
 const helpers = require('handlebars-helpers')();
 const bcrypt = require('bcryptjs');
+const moment = require('moment');
 const passport = require('passport');
 const flash = require('express-flash');
 const session = require('express-session');
@@ -28,7 +29,8 @@ app.use(passport.session());
 app.engine('handlebars', exphbs({
   // Customer helpers
   helpers: {
-    'incrementByOne': (num) => { num++; return num; }
+    'incrementByOne': (num) => { num++; return num },
+    'formatDate': (date) => { return moment(date).format('DD MMMM YYYY') }
   }
 }));
 app.set('view engine', 'handlebars');
@@ -78,6 +80,16 @@ app.get('/signup', (req, res) => {
   res.render('signup', getSessionInfo(req));
 });
 
+// Account - GET (view)
+app.get('/players/:id', async (req, res) => {
+  
+  Account.findById(req.params.id).populate('_id', 'game')
+    .then((acc, err) => {
+      if (err) throw err;
+      res.render('account', {acc});
+    })
+});
+
 // Account - POST
 app.post('/signup/', (req, res) => {
   Account.addAccount(req.body, (err) => {
@@ -90,12 +102,12 @@ app.post('/signup/', (req, res) => {
 // High scores route
 app.get('/leaderboard', (req, res) => {
   
-  const n = 10;   // Number of high scores to be retrieved
+  const n = 15;   // Number of high scores to be retrieved
 
-  Score.find().populate('account', 'username').then((scores, err) => {
+  Score.find().populate('account', 'username').sort('score').limit(n).then((scores, err) => {
     if (err) throw err;
-    res.render('leaderboard', {scores: scores});
-  }, parseInt(req.query.n));
+    return res.render('leaderboard', {scores: scores});
+  });
 });
 
 // Score - POST
@@ -107,7 +119,7 @@ app.post('/api/score', (req, res) => {
   });
 });
 
-// Score - GET
+// Top scores - GET
 app.get('/api/score', (req, res) => {
   
   Score.getScores((err, scores) => {
@@ -136,7 +148,7 @@ app.get('/api/game', (req, res) => {
 });
 
 // View game - GET
-app.get('/game/:gameID', (req, res) => {
+app.get('/games/:gameID', (req, res) => {
   var gameID = req.params.gameID;
   res.send(gameID);
 });
