@@ -30,7 +30,11 @@ app.engine('handlebars', exphbs({
   // Customer helpers
   helpers: {
     'incrementByOne': (num) => { num++; return num },
-    'formatDate': (date) => { return moment(date).format('DD MMMM YYYY') }
+    'formatDate': (date) => { return moment(date).format('DD MMMM YYYY') },
+    'bestScore': (games) => {
+      let bestGame = games.reduce((min, game) => min.score < game.score ? min : game);
+      return { id: bestGame.id, score: bestGame.score };
+    }
   }
 }));
 app.set('view engine', 'handlebars');
@@ -83,11 +87,23 @@ app.get('/signup', (req, res) => {
 // Account - GET (view)
 app.get('/players/:id', async (req, res) => {
   
-  Account.findById(req.params.id).populate('_id', 'game')
-    .then((acc, err) => {
-      if (err) throw err;
-      res.render('account', {acc});
-    })
+  try {
+  var acc = await Account.findById(req.params.id);
+  var games = await Score.find({ account: acc.id }).sort({create_date: 'desc'}).limit(10);
+  } catch(err) {
+    // TODO: send 404 page
+    res.status(404).json({ error: "Invalid account id" })
+  }
+
+  Score.find({account: acc.id}, 'score').then((scores, err) => {
+    if (err) throw err;
+
+    // Calculate best/avg using ALL games
+    let bestGame = scores.reduce((min, game) => min.score < game.score ? min : game)
+    let avgScore = Math.round(scores.reduce((total, next) => total + next.score, 0) / scores.length);
+
+    res.render('account', {acc, games, bestGame, avgScore});
+  })
 });
 
 // Account - POST

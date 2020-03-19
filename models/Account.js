@@ -26,7 +26,8 @@ const accountSchema = mongoose.Schema({
 
 const Account = module.exports = mongoose.model('Account', accountSchema);
 
-// Get accounts
+
+// Get all accounts
 module.exports.getAccounts = (callback, limit) => {
   Account.find(callback).limit(limit);
 }

@@ -1,0 +1,39 @@
+<h2>{{ acc.username }}</h2>
+
+<h5><i>Account created on {{ formatDate acc.create_date}}</i></h5>
+
+<h5><i>Number of games played: {{ games.length }}</i></h5>
+
+<h5><i>Best score: <a href="/games/{{ bestGame.id }}"> {{ bestGame.score }} points</a> </i></h5>
+
+<h5><i>Average score: {{ avgScore }} points</i></h5>
+
+<h3>Recent games</h3>
+
+{{#each games }}
+    <div class="row py-2 border-bottom">
+        <div class="font-weight-bold col-1">
+            <b>{{ incrementByOne @index }}:</b>
+        </div>
+
+        <div class="col-2">
+            <a href="/games/{{game}}">
+                {{ score }} points
+            </a>
+        </div>
+
+                <div class="col">
+            {{ formatDate create_date }}
+        </div>
+
+        <div class="col font-italic">
+            {{#if account }}
+                <a href="/players/{{ account.id }}">
+                    {{ account.username }}
+                </a>
+            {{else}}
+                A player
+            {{/if}}
+        </div>
+    </div>
+{{/each}}
