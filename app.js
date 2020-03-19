@@ -91,8 +91,7 @@ app.get('/players/:id', async (req, res) => {
   var acc = await Account.findById(req.params.id);
   var games = await Score.find({ account: acc.id }).sort({create_date: 'desc'}).limit(10);
   } catch(err) {
-    // TODO: send 404 page
-    res.status(404).json({ error: "Invalid account id" })
+    res.render('404');
   }
 
   Score.find({account: acc.id}, 'score').then((scores, err) => {
@@ -167,6 +166,18 @@ app.get('/api/game', (req, res) => {
 app.get('/games/:gameID', (req, res) => {
   var gameID = req.params.gameID;
   res.send(gameID);
+});
+
+// Error catching
+app.get('/*', (req, res) => {
+  // API endpoint not found (via AJAX)
+  if (req.xhr) {
+    res.status(404).json({error: "Endpoint not found"});
+  }
+  // Page not found
+  else {
+    res.render('404');
+  }
 });
 
 // Game - POST
