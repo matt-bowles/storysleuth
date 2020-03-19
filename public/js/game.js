@@ -78,11 +78,33 @@ function loadGame() {
     // Load the first story of the game
     showStory();
     drawGameSummary();
+    postGame();
 
     // Update scorecard values
     roundGuesses.forEach((guess) => {
         round++;
         updateScore(guess.roundScore);
+    });
+}
+
+function postGame() {
+    var rows = $(`#scoreCard tr`);
+
+    // Remove head & tails
+    rows = rows.splice(1, rows.length-2);
+
+    // Add hover styling
+    rows.forEach(row => {
+        $(row).mouseover(function(){ $(this).addClass("scorecardHover")});
+        $(row).mouseout(function(){ $(this).removeClass("scorecardHover")});
+    });
+
+    // Show location for round on map, as well as relevant stories
+    $(rows).click((row) => {
+        let index = rows.findIndex(r => r == row.currentTarget);
+        playlist = game[index];
+        showStory();
+        map.setView(allMarkers[index+1].getLatLng(), 15);
     });
 }
 
@@ -215,8 +237,7 @@ function makeGuess(){
             // Show all locations on map
             drawGameSummary();
 
-            // Yeah
-
+            postGame();
 
             // Send score to API
             fetch('/api/score', {
