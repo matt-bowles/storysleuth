@@ -16,6 +16,8 @@ var gameId;             // The generated ID for the current game being played
 
 var allMarkers = [];
 
+var gameData;
+
 /**
  * Initialise the game.
  *    - Define map object and set-up map events.
@@ -38,16 +40,51 @@ $(document).ready(function () {
         iconSize: [30, 30]
     });
 
-    map.on('click', function(e) {
-        playerGuessLat = e.latlng.lat;
-        playerGuessLng = e.latlng.lng;
-        placeGuessMarker(playerGuessLat, playerGuessLng);
-    });
-
+    // Enable the fullscreen plugin for Leaflet
     map.addControl(new L.Control.Fullscreen());
 
-    initaliseNewGame();
+    let gameData = $('#gameData').val();
+
+    // Check if existing game is being loaded
+    if (gameData) {
+        // Extract info from gameData, so that it can be used with existing functions
+        gameData = JSON.parse(gameData)[0];
+        game = gameData.game.rounds;
+        roundGuesses = gameData.roundScores;
+        playlist = gameData.game.rounds[0];
+
+        loadGame();
+    }
+    // New game is being played, let the user make guesses, etc.
+    else {
+        map.on('click', function(e) {
+            playerGuessLat = e.latlng.lat;
+            playerGuessLng = e.latlng.lng;
+            placeGuessMarker(playerGuessLat, playerGuessLng);
+        });
+    
+        initaliseNewGame();
+    }
 });
+
+/**
+ * Loads an existing game and disables guessing, etc.
+ */
+function loadGame() {
+    // Hide buttons that the user doesn't need
+    $('#guessButton').hide();
+    $('#nextRoundBtn').hide();
+
+    // Load the first story of the game
+    showStory();
+    drawGameSummary();
+
+    // Update scorecard values
+    roundGuesses.forEach((guess) => {
+        round++;
+        updateScore(guess.roundScore);
+    });
+}
 
 /**
  * Handles what happens when the user clicks on the map.

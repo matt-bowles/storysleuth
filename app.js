@@ -45,7 +45,7 @@ Playlist = require('./models/Playlist');
 Game = require('./models/Game');
 Account = require('./models/Account');
 
-// Connect to Mongoose
+// Connect to MongoDB via Mongoose
 mongoose.connect('mongodb://localhost:27017/whereami', {useNewUrlParser: true}, (err) => {
   if (err) throw err;
   console.log("Connected to MongoDB database!");
@@ -163,9 +163,9 @@ app.get('/api/game', (req, res) => {
 });
 
 // View game - GET
-app.get('/games/:gameID', (req, res) => {
-  var gameID = req.params.gameID;
-  res.send(gameID);
+app.get('/games/:gameID', async (req, res) => {
+  var gameData = await Score.find().where({ game: req.params.gameID }).populate('game');
+  res.render('game', {gameData: JSON.stringify(gameData)});
 });
 
 // Error catching
