@@ -101,10 +101,10 @@ function postGame() {
 
     // Show location for round on map, as well as relevant stories
     $(rows).click((row) => {
-        let index = rows.findIndex(r => r == row.currentTarget);
-        playlist = game[index];
+        let i = rows.findIndex(r => r == row.currentTarget);
+        playlist = game[i];
         showStory();
-        map.setView(allMarkers[index+1].getLatLng(), 15);
+        map.setView([game[i].coords.lat, game[i].coords.lng], 15);
     });
 }
 
