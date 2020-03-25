@@ -283,7 +283,9 @@ function drawGameSummary() {
 
 function initaliseNewRound() {
     $('#nextRoundBtn').hide();
+    $('#prevBtn').attr('disabled', false);
 
+    storyCounter = 0;
     playlist = game[round];
     showStory();
 
@@ -301,6 +303,10 @@ function initaliseNewRound() {
  */
 function initaliseNewGame() {
     $('#nextRoundBtn').hide();
+    $('#prevBtn').attr('disabled', false);
+
+    // Remove post-game functionality, just incase...
+    $(`#scoreCard tr`).unbind();
 
     // Load new game
     axios.get('/api/game').then((g) => {
