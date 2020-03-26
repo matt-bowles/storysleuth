@@ -195,8 +195,15 @@ app.post('/api/game/', (req, res) => {
 });
 
 function getSessionInfo(req) {
-  return {
-    isLoggedIn: req.isAuthenticated(),
+
+  if (!req.isAuthenticated()) {
+    return { isLoggedIn: false }
+  } else {
+    return {
+      isLoggedIn: req.isAuthenticated(),
+      username: req.user.username,
+      id: req.user._id
+    }
   }
 }
 

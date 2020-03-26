@@ -22,6 +22,10 @@
 
         {{#if isLoggedIn }}
 
+        <li class="nav-item ml-3">
+          <a href="/players/{{ id }}" class="nav-link">{{ username }}</a>
+        </li>
+
         <li class="nav-item">
           <a href="/logout" class="nav-link">Logout</a>
         </li>
