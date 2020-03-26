@@ -71,7 +71,8 @@ app.get('/login', (req, res) => {
 app.post('/login', passport.authenticate('local', {
   successRedirect: '/',
   failureRedirect: '/login',
-  failureFlash: true
+  failureFlash: true,
+  successFlash: true
 }));
 
 app.get('/logout', function(req, res){
@@ -81,17 +82,18 @@ app.get('/logout', function(req, res){
 
 app.get('/signup', (req, res) => {
   if (req.isAuthenticated()) return res.redirect('/');
-  res.render('signup', getSessionInfo(req));
+  req.flash('messages.success', "Account created");
+  res.render('signup');
 });
 
 // Account - GET (view)
 app.get('/players/:id', async (req, res) => {
   
   try {
-  var acc = await Account.findById(req.params.id);
-  var games = await Score.find({ account: acc.id }).sort({create_date: 'desc'}).limit(10);
+    var acc = await Account.findById(req.params.id);
+    var games = await Score.find({ account: acc.id }).sort({create_date: 'desc'}).limit(10);
   } catch(err) {
-    res.render('404');
+    res.render('404', getSessionInfo(req));
   }
 
   Score.find({account: acc.id}, 'score').then((scores, err) => {
@@ -107,21 +109,24 @@ app.get('/players/:id', async (req, res) => {
 
 // Account - POST
 app.post('/signup/', (req, res) => {
+
   Account.addAccount(req.body, (err) => {
-    if (err) throw err;
-    console.log("Account registered!");
+    if (err) return res.json(err);
+    req.flash("success", "Account registered - please login");
+    res.redirect('/login');
   });
-  res.send("Success", getSessionInfo(req));
 });
 
 // High scores route
 app.get('/leaderboard', (req, res) => {
   
-  const n = 15;   // Number of high scores to be retrieved
+  const n = 25;   // Number of high scores to be retrieved
+  let info = getSessionInfo(req);
 
   Score.find().populate('account', 'username').sort('score').limit(n).then((scores, err) => {
     if (err) throw err;
-    return res.render('leaderboard', {scores: scores});
+    info.scores = scores;
+    return res.render('leaderboard', info);
   });
 });
 

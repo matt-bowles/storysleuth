@@ -19,8 +19,8 @@ function inititalisePassport(passport) {
         // Check if password matches  
         bcrypt.compare(password, acc.password, (err, res) => {
           res ?
-          done(null, acc) :
-          done(null, false, { message: "Password incorrect" });
+          done(null, acc, "Logged in") :
+          done(null, false, "Password incorrect");
         });
 
       });

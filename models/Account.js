@@ -12,7 +12,8 @@ const accountSchema = mongoose.Schema({
   email: {
     type: String,
     unique: true,
-    required: false
+    required: false,
+    sparse: true
   },
   password: {
       type: String,
@@ -36,8 +37,11 @@ module.exports.getAccounts = (callback, limit) => {
 module.exports.addAccount = (account, callback) => {
   // Hash password and save account to database
   bcrypt.genSalt(10, (err, salt) => {
+
+    if (err) throw err;
+
     bcrypt.hash(account.password, salt, (err, hash) => {
-      Account.create({ username: account.username, password: hash,email: account.email }, callback);
+      Account.create({ username: account.username, password: hash }, callback);
     })
   });
 }

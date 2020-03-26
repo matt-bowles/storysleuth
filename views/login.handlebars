@@ -1,6 +1,18 @@
 <div class="container mt-5 w-50 bg-light p-5 rounded">
+
     <form action="/login" method="post">
-        <h2 class="text-center mb-4">Log-in</h2>       
+        <h2 class="text-center mb-4">Log-in</h2>  
+
+        {{!-- Display any flash messages --}}
+            <div class="clearfix text-center mb-4 text-bold">
+                {{#if messages.error}}
+                    <span class="text-danger">{{ messages.error }}</span>
+                {{/if}}
+                {{#if messages.success}}
+                    <span class="text-success">{{ messages.success }}</span>
+                {{/if}}
+            </div>
+
         <div class="form-group">
             <input type="text" name="username" class="form-control" placeholder="Username" required="required">
         </div>
@@ -13,7 +25,7 @@
         <div class="clearfix">
             <label class="checkbox-inline float-left"><input type="checkbox" class="mr-1">Remember me</label>
             <a href="#" class="float-right">Forgot Password?</a>
-        </div>        
+        </div>     
     </form>
     <p class="text-center mt-4"><a href="/signup">Create an Account</a></p>
 </div>
