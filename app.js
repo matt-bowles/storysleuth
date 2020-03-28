@@ -58,8 +58,13 @@ app.use(express.static('public'));
 // Use a favicon
 app.use(favicon(path.join(__dirname, 'public', 'img/favicon.ico')));
 
-// Home route (the "game")
+// Home/about route
 app.get('/', (req, res) => {
+  res.render('home', getSessionInfo(req));
+});
+
+// The "game"
+app.get('/play', (req, res) => {
   res.render('game', getSessionInfo(req));
 });
 
@@ -89,21 +94,23 @@ app.get('/signup', (req, res) => {
 // Account - GET (view)
 app.get('/players/:id', async (req, res) => {
   
+  let info = getSessionInfo(req);
+
   try {
-    var acc = await Account.findById(req.params.id);
-    var games = await Score.find({ account: acc.id }).sort({create_date: 'desc'}).limit(10);
+    info.acc = await Account.findById(req.params.id);
+    info.games = await Score.find({ account: acc.id }).sort({create_date: 'desc'}).limit(10);
   } catch(err) {
     res.render('404', getSessionInfo(req));
   }
 
-  Score.find({account: acc.id}, 'score').then((scores, err) => {
+  Score.find({account: info.acc.id}, 'score').then((scores, err) => {
     if (err) throw err;
-
+    
     // Calculate best/avg using ALL games
-    let bestGame = scores.reduce((min, game) => min.score < game.score ? min : game)
-    let avgScore = Math.round(scores.reduce((total, next) => total + next.score, 0) / scores.length);
+    info.bestGame = scores.reduce((min, game) => min.score < game.score ? min : game)
+    info.avgScore = Math.round(scores.reduce((total, next) => total + next.score, 0) / scores.length);
 
-    res.render('account', {acc, games, bestGame, avgScore});
+    res.render('account', info);
   })
 });
 

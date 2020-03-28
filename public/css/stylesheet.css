@@ -41,3 +41,12 @@ th {
   background-color: lightblue !important;
   cursor: pointer;
 }
+
+/* About page */
+h1, h4 {
+  text-align: center;
+}
+
+h6 {
+  margin: 10em;
+}
