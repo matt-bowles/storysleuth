@@ -98,18 +98,20 @@ app.get('/players/:id', async (req, res) => {
 
   try {
     info.acc = await Account.findById(req.params.id);
-    info.games = await Score.find({ account: acc.id }).sort({create_date: 'desc'}).limit(10);
+    info.games = await Score.find({ account: info.acc.id }).sort({create_date: 'desc'}).limit(10);
   } catch(err) {
-    res.render('404', getSessionInfo(req));
+    console.log(req.params.id);
+    return res.render('404', getSessionInfo(req));
   }
 
   Score.find({account: info.acc.id}, 'score').then((scores, err) => {
     if (err) throw err;
     
-    // Calculate best/avg using ALL games
-    info.bestGame = scores.reduce((min, game) => min.score < game.score ? min : game)
-    info.avgScore = Math.round(scores.reduce((total, next) => total + next.score, 0) / scores.length);
-
+    // Calculate best/avg using ALL games 
+    if (info.games.length > 0) {
+      info.bestGame = scores.reduce((min, game) => min.score < game.score ? min : game)
+      info.avgScore = Math.round(scores.reduce((total, next) => total + next.score, 0) / scores.length);
+    }
     res.render('account', info);
   })
 });
