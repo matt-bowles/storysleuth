@@ -46,7 +46,7 @@ Game = require('./models/Game');
 Account = require('./models/Account');
 
 // Connect to MongoDB via Mongoose
-mongoose.connect('mongodb://localhost:27017/whereami', {useNewUrlParser: true}, (err) => {
+mongoose.connect(process.env.CONNECTION_STRING, {useNewUrlParser: true}, (err) => {
   if (err) throw err;
   console.log("Connected to MongoDB database!");
 });
