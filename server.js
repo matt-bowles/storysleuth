@@ -217,4 +217,4 @@ function getSessionInfo(req) {
 }
 
 // Run the web server using Express
-app.listen(8081, () => console.log('The application is running on localhost:3000!'));
+app.listen(8081, () => console.log('The application is running on localhost:8081!'));
