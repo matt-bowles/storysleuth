@@ -182,18 +182,6 @@ app.get('/games/:gameID', async (req, res) => {
   res.render('game', {gameData: JSON.stringify(gameData)});
 });
 
-// Error catching
-app.get('/*', (req, res) => {
-  // API endpoint not found (via AJAX)
-  if (req.xhr) {
-    res.status(404).json({error: "Endpoint not found"});
-  }
-  // Page not found
-  else {
-    res.render('404');
-  }
-});
-
 // Game - POST
 app.post('/api/game/', (req, res) => {
   Game.addGame(req.body, (err) => {
@@ -205,6 +193,18 @@ app.post('/api/game/', (req, res) => {
 
 app.get('/api/test', (req, res) => {
   res.json({testMsg: "Test successful", req, sessionInfo: getSessionInfo(req)});
+});
+
+// Error catching
+app.get('/*', (req, res) => {
+  // API endpoint not found (via AJAX)
+  if (req.xhr) {
+    res.status(404).json({error: "Endpoint not found"});
+  }
+  // Page not found
+  else {
+    res.render('404');
+  }
 });
 
 function getSessionInfo(req) {
@@ -221,4 +221,5 @@ function getSessionInfo(req) {
 }
 
 // Run the web server using Express
-app.listen(8081, () => console.log('The application is running on localhost:8081!'));
+var port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`The application is running on localhost:${port}!`));
