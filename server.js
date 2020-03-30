@@ -203,6 +203,10 @@ app.post('/api/game/', (req, res) => {
   });
 });
 
+app.get('/api/test', (req, res) => {
+  res.json({testMsg: "Test successful", req, sessionInfo: getSessionInfo(req)});
+});
+
 function getSessionInfo(req) {
 
   if (!req.isAuthenticated()) {
