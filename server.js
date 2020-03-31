@@ -3,6 +3,7 @@ var express = require('express');
 var app = express();
 var favicon = require('serve-favicon');
 var path = require('path');
+require('dotenv').config();   // Requires a .env file to be located in the root directory
 
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
