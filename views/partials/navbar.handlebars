@@ -49,5 +49,7 @@
   var current = document.querySelector(`#navbarResponsive a[href|='${window.location.pathname}'`);
   
   // Give the nav element that "selected" appearance
-  current.classList.add('active');
+  if (current) {
+    current.classList.add('active');
+  }
 </script>
