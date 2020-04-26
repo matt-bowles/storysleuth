@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Where Are I?</title>
+
+    <link href="/css/stylesheet.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    {{!-- Leaflet --}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+
+    {{!-- Leaflet fullscreen --}}
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+
+    {{!-- Leaflet motion --}}
+    <script src="https://unpkg.com/leaflet.motion@0.1.5/dist/leaflet.motion.min.js"></script>
+
+    {{!-- Jquery --}}
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+    {{!-- Axios for Ajax --}}
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    {{!-- Custom CSS/functionality --}}
+    <link rel="stylesheet" href="/css/game.css">
+    <script type="text/javascript" src="/js/gameFunctions.js"></script>
+    <script type="text/javascript" src="/js/game.js"></script>
+</head>
+<body>
+    {{>navbar}}
+    <div class="container bg-light p-5 rounded" id="mainContainer">
+        {{{body}}}
+    </div>
+    {{>footer}}
+</body>
+</html>

@@ -1,85 +1,98 @@
+{{!-- Guess result goes here --}}
+<div class="row text-center" id="guessResult" style="display: none"></div>
 
-<div class="row">
+  {{!-- Main container --}}
+  <div>
 
-</div>
-<div class="row" id="guessResult">
-</div>
 
-<div class="row">
-  <div class="col-3">
-      <table id="scoreCard" class="table-bordered table-striped table-sm col-10">
-          <thead class="thead-dark">
-            <th colspan="2">Score</th>
+    <div class="p-2 border border-dark">
+
+        <table id="scoreCard" class="table-bordered border table-striped table-sm">
+          <thead>
+            <th colspan="100%">Score</th>
           </thead>
           <tr>
-            <td>Round 1</td>
-            <td></td>
+            <td>
+              <i>Round 1</i>
+            </td>
+            <td>
+              <i>Round 2</i>
+            </td>
+            <td>
+              <i>Round 3</i>
+            </td>
+            <td>
+              <i>Round 4</i>
+            </td>
+            <td>
+              <i>Round 5</i>
+            </td>
+            <td>
+              <b><i>Total</i></b>
+            </td>
           </tr>
           <tr>
-            <td>Round 2</td>
+            {{!-- These empty td elements are to be filled with scores as the game progresses --}}
             <td></td>
-          </tr>
-          <tr>
-            <td>Round 3</td>
             <td></td>
-          </tr>
-          <tr>
-            <td>Round 4</td>
             <td></td>
-          </tr>
-          <tr>
-            <td>Round 5</td>
             <td></td>
-          </tr>
-          <tr>
-            <td class="font-weight-bold">Total score</td>
-            <td><span id="score">0</td>
+            <td></td>
+            <td><span id="score">0</span></td>
           </tr>
         </table>
-  </div>
-  <div class="col">
-    <div id="media_content">
-      <img id="image_display" src="" alt="This is an image. Good luck">
-      <video controls id="video_player">
-        <source src="" type="video/mp4">
-      </video>
+      </div>
+
+ 
+    {{!-- Media player and map --}}
+    <div class="d-flex flex-wrap">
+
+      {{!-- Media player --}}
+      <div class="p-2 border border-dark">
+
+        <div id="media_content">
+          <img id="image_display" src="/img/loading.png">
+          <video controls id="video_player" style="display: none">
+            <source src="" type="video/mp4">
+          </video>
+        </div>
+        <!-- Start with default story - no. 0 in json array -->
+      
+        <div class="mt-3" >
+          <div id="buttons-timestamp-container">
+            <!-- Story nav buttons -->
+            <div id="story-buttons">
+              <button id="prevBtn" class="btn btn-outline-dark" onclick="prevStory()"><-- Prev</button>
+              <button id="nextBtn" class="btn btn-outline-dark" onclick="nextStory()">Next --></button>
+            </div>
+            <h5 id="timestamp">Loading...</h5> 
+          </div>
+        </div>
+        
+      </div>
+
+      {{!-- Map --}}
+      <div class="p-2 border border-dark flex-grow-1">
+        
+      <div id="map"></div>
+
+      <div class="mt-3">
+        <button type="button" class="btn btn-danger" id="guessButton" onclick="makeGuess()" disabled>Make guess</button>
+        <button type="button" class="btn btn-primary" id="nextRoundBtn" onclick="initaliseNewRound()">Next round</button>   
+      </div>
+        
+      </div>
     </div>
-    <!-- Start with default story - no. 0 in json array -->
-    <h3 id="timestamp"></h3> 
-
-    <!-- Story nav buttons -->
-    <button id="prevBtn" class="btn btn-outline-dark" onclick="prevStory()"><-- Prev</button>
-    <button id="nextBtn" class="btn btn-outline-dark" onclick="nextStory()">Next --></button>
 
   </div>
-  <div class="col">
-    <div id="mapid"></div>
-    <button type="button" class="btn btn-danger" id="guessButton" onclick="makeGuess()" disabled>Make guess</button>
-    <button type="button" class="btn btn-primary" id="nextRoundBtn" onclick="initaliseNewRound()">Next round</button>
-  </div>
-</div>
+
+
+
+
+
 
 {{!-- Holds data for a previous game (that is being viewed)
 Can obviously be empty --}}
 <form>
   <input type="hidden" name="gameData" id="gameData" value="{{ gameData }}">
 </form>
-
-
-{{!-- Leaflet --}}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
-
-{{!-- Leaflet fullscreen --}}
-<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
-<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
-
-{{!-- Jquery --}}
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-
-{{!-- Axios for Ajax --}}
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
-{{!-- Custom functionality --}}
-<script type="text/javascript" src="/js/gameFunctions.js"></script>
-<script type="text/javascript" src="/js/game.js"></script>

@@ -1,0 +1,85 @@
+#map, #media_content:nth-child(1) {
+  height: 500px;
+}
+
+#guessResult {
+  margin: auto;
+  width: 50%;
+  margin-bottom: 50px;
+}
+
+#scoreCard {
+  margin-left: 3.5%;
+}
+
+th {
+  text-align: center;
+}
+  
+#media_content img, video {
+  width: 281px;
+  height: 500px;
+}
+
+#timestamp {
+  width: 50%;
+}
+  
+#btnPlayAgain {
+  text-align: center;
+  cursor: pointer;
+}
+
+.scorecardHover {
+  background-color: lightblue !important;
+  cursor: pointer;
+}
+
+/* Flex stuff */
+#mainContainer {
+  height: 100%;
+  background-color: lightblue;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+/* Overwriting Boostrap CSS rules */
+
+.column {
+  display: flex;
+}
+
+.roundText {
+  content: "R";
+}
+
+@media only screen and (max-width: 1028px) {
+
+  /* tr, thead { float: left; }
+  th, td { 
+    display: block;
+    text-align: center;
+  }
+
+
+  td {
+    height: 50px;
+  }
+  
+  tbody {
+    width: 50% !important;
+  }
+
+  #scoreCard {
+    width: 100%;
+  } */
+}
+
+#scoreCard, #buttons-timestamp-container {
+  margin: 0 auto;
+}
+
+#story-buttons {
+  margin: 0, auto;
+}

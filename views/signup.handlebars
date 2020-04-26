@@ -15,29 +15,27 @@
     }
 </script>
 
-<div class="container mt-5 w-50 bg-light p-5 rounded">
-    <form action="/signup" method="post">
-        <h2 class="text-center mb-4">Sign-up</h2>       
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" name="username" class="form-control" placeholder="Username" required>
-        </div>
-        <div class="form-group">
-            <label for="email">Email <i>(optional)</i></label>
-            <input type="email" name="email" class="form-control" placeholder="Email">
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" class="form-control" placeholder="Password" onkeyup="checkPassword()" required>
-        </div>
-        <div class="form-group">
-            <label for="confirm">Confirm password</label>
-            <input type="password" id="confirm" class="form-control" required onkeyup="checkPassword()">
-        </div>
-        <div class="form-group text-center">
-            <span class="clearfix text-center m-4 text-danger" id="errorText"></span>
-            <button type="submit" id="submitBtn" class="btn btn-primary w-50">Create account</button>
-        </div>    
-    </form>
-    <p class="text-center mt-4"><a href="/login">Already have an account? Log-in</a></p>
-</div>
+<form action="/signup" method="post">
+    <h2 class="text-center mb-4">Sign-up</h2>       
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" name="username" class="form-control" placeholder="Username" required>
+    </div>
+    <div class="form-group">
+        <label for="email">Email <i>(optional)</i></label>
+        <input type="email" name="email" class="form-control" placeholder="Email">
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="Password" onkeyup="checkPassword()" required>
+    </div>
+    <div class="form-group">
+        <label for="confirm">Confirm password</label>
+        <input type="password" id="confirm" class="form-control" placeholder="Confirm password" required onkeyup="checkPassword()">
+    </div>
+    <div class="form-group text-center">
+        <span class="clearfix text-center m-4 text-danger" id="errorText"></span>
+        <button type="submit" id="submitBtn" class="btn btn-primary w-50">Create account</button>
+    </div>    
+</form>
+<p class="text-center mt-4"><a href="/login">Already have an account? Log-in</a></p>

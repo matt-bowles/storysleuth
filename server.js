@@ -66,7 +66,7 @@ app.get('/', (req, res) => {
 
 // The "game"
 app.get('/play', (req, res) => {
-  res.render('game', getSessionInfo(req));
+  res.render('game', {info: getSessionInfo(req), layout: "game-layout"});
 });
 
 app.get('/login', (req, res) => {
@@ -180,7 +180,7 @@ app.get('/api/game', (req, res) => {
 // View game - GET
 app.get('/games/:gameID', async (req, res) => {
   var gameData = await Score.find().where({ game: req.params.gameID }).populate('game');
-  res.render('game', {gameData: JSON.stringify(gameData)});
+  res.render('game', {gameData: JSON.stringify(gameData), layout: "game-layout"});
 });
 
 // Game - POST

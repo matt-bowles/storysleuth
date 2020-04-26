@@ -1,0 +1,65 @@
+Scorecard
+  <div class="d-flex flex-wrap">
+      <table id="scoreCard" class="table-bordered table-striped table-sm col-11">
+        <thead class="thead-dark">
+          <th colspan="2">Score</th>
+        </thead>
+        <tr>
+          <td><span class="roundText">Round</span> 1</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><span class="roundText">Round</span> 2</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><span class="roundText">Round</span> 3</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><span class="roundText">Round</span> 4</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><span class="roundText">Round</span> 5</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="font-weight-bold">Total</td>
+          <td><span id="score">0</span></td>
+        </tr>
+      </table>
+  </div>
+
+  
+  <div>
+    {{!-- Media player (including buttons) --}}
+    <div>
+      <div id="media_content">
+        <img id="image_display" src="/img/loading.png">
+        <video controls id="video_player">
+          <source src="" type="video/mp4">
+        </video>
+      </div>
+      <!-- Start with default story - no. 0 in json array -->
+    
+      <div class="mt-3" >
+        <!-- Story nav buttons -->
+        <button id="prevBtn" class="btn btn-outline-dark" onclick="prevStory()"><-- Prev</button>
+        <button id="nextBtn" class="btn btn-outline-dark" onclick="nextStory()">Next --></button>
+        <div style="float: right">
+        <h5 id="timestamp">Loading...</h5> 
+        </div>
+      </div>
+    </div>
+
+    {{!-- Leaflet map (including buttons) --}}
+    <div>
+      <div id="map"></div>
+
+      <div class="mt-3">
+        <button type="button" class="btn btn-danger" id="guessButton" onclick="makeGuess()" disabled>Make guess</button>
+        <button type="button" class="btn btn-primary" id="nextRoundBtn" onclick="initaliseNewRound()">Next round</button>   
+      </div>
+    </div>
+  </div>

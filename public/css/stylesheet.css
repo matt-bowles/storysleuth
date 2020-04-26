@@ -4,43 +4,10 @@
   font-family: 'Comfortaa', Arial, Helvetica, sans-serif;
 }
 
-#mapid {
-  width: 170%;
-  height: 650px;
+body {
+  background-color: lightskyblue !important;
 }
 
-#guessResult {
-  margin: auto;
-  width: 50%;
-  margin-bottom: 50px;
-}
-
-#scoreCard {
-  margin-left: 3.5%;
-}
-
-th {
-  text-align: center;
-}
-
-#scoreCard td {
-  width: 50px;
-}
-
-#media_content img, video {
-  width: 365px;
-  height: 653px;
-}
-
-#btnPlayAgain {
-  text-align: center;
-  cursor: pointer;
-}
-
-.scorecardHover {
-  background-color: lightblue !important;
-  cursor: pointer;
-}
 
 /* About page */
 h1, h4 {

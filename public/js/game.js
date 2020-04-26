@@ -26,7 +26,7 @@ var gameData;
  *    - Hide the next round button (made visible when player guesses). 
  */
 $(document).ready(function () {
-    map = L.map('mapid', { worldCopyJump: true, minZoom: 1.5 }).setView([0, 0], 0);
+    map = L.map('map', { worldCopyJump: true, minZoom: 1.5 }).setView([0, 0], 0);
 
     // Add a tileset to the map - very pretty.
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -65,6 +65,17 @@ $(document).ready(function () {
     
         initaliseNewGame();
     }
+
+
+
+
+    // Change "round" text to "r" when mobil
+    if (window.innerWidth <= 667) {
+        $('.roundText').text("R.");
+    } else {
+        $('.roundText').text("Round");
+    }
+    console.log(window.outerWidth);
 });
 
 /**
@@ -88,7 +99,7 @@ function loadGame() {
 }
 
 function postGame() {
-    var rows = $(`#scoreCard tr`);
+    var rows = $(`#scoreCard > tbody:nth-child(2) > tr:nth-child(2)`);
 
     // Remove head & tails
     rows = rows.splice(1, rows.length-2);
@@ -193,7 +204,7 @@ function showStory() {
  * Updates the game's current score, and updates the text which displays it.
  */ 
     function updateScore(dist) {
-    $(`#scoreCard tr:nth-child(${round}) td:nth-child(2)`).text(dist);
+    $(`#scoreCard tr:nth-child(2) td:nth-child(${round})`).text(dist);
     score += dist;
     $('#score').text(score);
 }
@@ -216,6 +227,7 @@ function makeGuess(){
         
         // Display guess info - how far off was the player?
         var dist = getDistanceFromLatLonInKm(playlist.coords.lat, playlist.coords.lng, playerGuessLat, playerGuessLng);
+        $('#guessResult').show();
         $('#guessResult').html(`Your guess was <b> ${dist} km</b> away from the correct location.`);
 
         // Fly to actual location
@@ -260,7 +272,22 @@ function makeGuess(){
  * @param {*} m2 
  */
 function lineBetweenTwoMarkers(m1, m2) {
-    L.polyline([m1.getLatLng(), m2.getLatLng()], {color: 'black', dashArray: "1 5"}).addTo(map);
+    L.motion.polyline(
+        [m1.getLatLng(), m2.getLatLng()],
+        {
+            color: 'black',
+            dashArray: "1 5"},
+        {
+            auto: true,
+            duration: 500,
+            easing: L.Motion.Ease.easeInOutQuart
+        },
+        {
+            removeOnEnd: true,
+            showMarker: false,
+        }
+
+    ).addTo(map);
 }
 
 /**
@@ -283,6 +310,7 @@ function drawGameSummary() {
 
 function initaliseNewRound() {
     $('#nextRoundBtn').hide();
+    $('#guessResult').hide();
     $('#prevBtn').attr('disabled', false);
 
     storyCounter = 0;
@@ -326,9 +354,11 @@ function resetGame() {
     // Remove btn
     $('#btnPlayAgain').remove();
 
+    $('#guessResult').hide();
+
     // Reset scoreboard
     for (i=1; i<=5; i++) {
-        $(`#scoreCard tr:nth-child(${i}) td:nth-child(2)`).text("");
+        $(`#scoreCard tr:nth-child(2) td:nth-child(${i})`).text("");
     }
     score = 0;
     $('#score').text(score);
