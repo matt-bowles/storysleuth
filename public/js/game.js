@@ -75,7 +75,6 @@ $(document).ready(function () {
     } else {
         $('.roundText').text("Round");
     }
-    console.log(window.outerWidth);
 });
 
 /**
@@ -314,7 +313,9 @@ function drawGameSummary() {
         var actualLocMarker = L.marker([game[i].coords.lat, game[i].coords.lng], { icon: locIcon }).addTo(map);
         var guessLocMarker = L.marker([roundGuesses[i].guessLat, roundGuesses[i].guessLng]).addTo(map);
 
-        createTooltip(actualLocMarker, game[i].location);
+        if (game[i].location) {
+            createTooltip(actualLocMarker, game[i].location);
+        }
 
         allMarkers.push(actualLocMarker);
         allMarkers.push(guessLocMarker);
