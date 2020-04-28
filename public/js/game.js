@@ -223,6 +223,9 @@ function makeGuess(){
         // Add location marker to map
         markers['locMarker'] = L.marker([playlist.coords.lat, playlist.coords.lng], {icon: locIcon}).addTo(map);
 
+        // Show location name when hovering over the marker
+        createTooltip(markers['locMarker'], playlist.location);
+ 
         lineBetweenTwoMarkers(markers['guessMarker'], markers['locMarker']);
         
         // Display guess info - how far off was the player?
@@ -267,6 +270,17 @@ function makeGuess(){
 }
 
 /**
+ * Creates a tooltip for a marker that when hovered over, reveals the location's name. 
+ * @param {*} marker any Leaflet marker
+ * @param {*} location an object containing keys for "city" and "country"
+ */
+function createTooltip(marker, location) {
+    marker.bindTooltip(`${location.city}, ${location.country}`, { direction: 'top', offset: [5, -12] });
+    marker.on('mouseover', function (e) { this.openTooltip(); });
+    marker.on('mouseout', function (e) { this.closeTooltip(); });
+}
+
+/**
  * Draws a dashed black line between 2 markers, and then adds it to the map
  * @param {*} m1 
  * @param {*} m2 
@@ -299,6 +313,8 @@ function drawGameSummary() {
         // Add locations to map
         var actualLocMarker = L.marker([game[i].coords.lat, game[i].coords.lng], { icon: locIcon }).addTo(map);
         var guessLocMarker = L.marker([roundGuesses[i].guessLat, roundGuesses[i].guessLng]).addTo(map);
+
+        createTooltip(actualLocMarker, game[i].location);
 
         allMarkers.push(actualLocMarker);
         allMarkers.push(guessLocMarker);

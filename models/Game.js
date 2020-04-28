@@ -29,9 +29,16 @@ const storySchema = mongoose.Schema({
   }
 })
 
+// Location schema
+const locationSchema = mongoose.Schema({
+  city: { type: String },
+  country: { type: String }
+})
+
 // Round schema
 const roundSchema = mongoose.Schema({
   coords: coordsSchema,
+  location: locationSchema,
   stories: [storySchema]
 })
 

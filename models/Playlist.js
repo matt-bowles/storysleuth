@@ -159,6 +159,7 @@ function processPlaylist(playlist, city, _callback) {
   
     playlist.coords = {lat: city.lat, lng: city.lng};
     playlist.stories = stories;
+    playlist.location = {city: city.city, country: city.country};
   
     resolve(playlist);
   });
