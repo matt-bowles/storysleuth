@@ -97,24 +97,30 @@ function loadGame() {
     });
 }
 
+/**
+ * Allows users to revisit the playlist of each round
+ */
 function postGame() {
-    var rows = $(`#scoreCard > tbody:nth-child(2) > tr:nth-child(2)`);
+    // The "round" labels (1 through 5)
+    cols = $("#scoreCard > tbody:nth-child(1) > tr:nth-child(1) td");
+    cols = Object.values(cols);
+    cols = cols.slice(0, cols.length-3);
 
-    // Remove head & tails
-    rows = rows.splice(1, rows.length-2);
-
-    // Add hover styling
-    rows.forEach(row => {
-        $(row).mouseover(function(){ $(this).addClass("scorecardHover")});
-        $(row).mouseout(function(){ $(this).removeClass("scorecardHover")});
+    // Add hover styling to each label
+    cols.forEach((col) => {
+        col.addEventListener('mouseover', () => col.classList.add("scorecardHover"));
+        col.addEventListener('mouseout', () => col.classList.remove("scorecardHover"));
     });
 
+
     // Show location for round on map, as well as relevant stories
-    $(rows).click((row) => {
-        let i = rows.findIndex(r => r == row.currentTarget);
-        playlist = game[i];
-        showStory();
-        map.setView([game[i].coords.lat, game[i].coords.lng], 15);
+    cols.forEach((col) => {
+        col.addEventListener('click', () => {
+            let i = cols.findIndex(c => c == col);
+            playlist = game[i];
+            showStory();
+            map.setView([game[i].coords.lat, game[i].coords.lng], 15);
+        })
     });
 }
 
