@@ -1,0 +1,17 @@
+<form action="/players/{{ acc._id }}/settings" method="post">
+    <h2 class="text-center mb-4">Settings - {{ acc.username }}</h2>       
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" name="username" class="form-control" placeholder="Username" required value={{ acc.username }}>
+    </div>
+    <div class="form-group">
+        <label for="email">Email <i>(optional)</i></label>
+        <input type="email" name="email" class="form-control" placeholder="Email" value={{ acc.email }}>
+    </div>
+    <div class="form-group text-center">
+        <span class="clearfix text-center m-4 text-danger" id="errorText"></span>
+        <a href="./" class="btn btn-primary w-25">Back</a>
+        <button type="submit" id="submitBtn" class="btn btn-primary w-25">Update details</button>
+        <button type="submit" id="submitBtn" class="btn btn-danger w-25">Delete account</button>
+    </div>    
+</form>

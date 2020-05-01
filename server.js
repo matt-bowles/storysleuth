@@ -100,8 +100,11 @@ app.get('/players/:id', async (req, res) => {
   try {
     info.acc = await Account.findById(req.params.id);
     info.games = await Score.find({ account: info.acc.id }).sort({create_date: 'desc'}).limit(10);
+
+    // Determines whether or not the "settings" button should be displayed
+    // (user must be logged in as the correct account)
+    info.displaySettingsButton = (req.isAuthenticated() && req.user._id === req.params.id);
   } catch(err) {
-    console.log(req.params.id);
     return res.render('404', getSessionInfo(req));
   }
 
@@ -115,6 +118,47 @@ app.get('/players/:id', async (req, res) => {
     }
     res.render('account', info);
   })
+});
+
+// The page from which a user can manage their account details
+app.get('/players/:id/settings', async (req, res) => {
+
+  let info = getSessionInfo(req);
+
+  // User is either not logged in, or logged into the wrong account
+  if (req.isUnauthenticated() || req.user._id !== req.params.id) {
+    req.flash("danger", "You are not authorised to view this page");
+    return res.redirect('/login');
+  }
+
+  try {
+    info.acc = await Account.findById(req.params.id);
+    return res.render('account-settings', info);
+  } catch (err) {
+    return res.render('404', info);
+  }
+});
+
+// This route is accessed when a user updates their details
+app.post('/players/:id/settings', async (req, res) => {
+  // User is either not logged in, or logged into the wrong account
+  if (req.isUnauthenticated() || req.user._id !== req.params.id) {
+    req.flash("danger", "You are not authorised to view this page");
+    return res.redirect('/login');
+  }
+
+  try {
+    // Update account details
+    await Account.updateOne({ _id: req.params.id }, {
+      username: req.body.username
+    });
+
+    req.flash("success", "Account details updated")
+    return res.redirect(req.originalUrl);
+  } catch (err) {
+    req.flash(err);
+    return res.render('account-settings', info);
+  }
 });
 
 // Account - POST

@@ -6,16 +6,15 @@
 
 
     {{!-- Scorecard --}}
-    <div class="p-2 border border-dark">
-      {{>scorecard}}
-    </div>
+    {{!-- <div class="p-2 border border-dark">
+      
+    </div> --}}
  
     {{!-- Media player and map --}}
     <div class="d-flex flex-wrap">
 
       {{!-- Media player --}}
       <div class="p-2 border border-dark">
-
         <div id="media_content">
           <img id="image_display" src="/img/loading.png">
           <video controls id="video_player" style="display: none">
@@ -39,6 +38,7 @@
 
       {{!-- Map --}}
       <div class="p-2 border border-dark flex-grow-1">
+        {{>scorecard}}
         
       <div id="map"></div>
 
