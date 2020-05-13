@@ -37,6 +37,10 @@ th {
   cursor: pointer;
 }
 
+#scoreCard {
+  width: 100%;
+}
+
 .scorecardHover {
   background-color: lightblue !important;
   cursor: pointer;
@@ -66,6 +70,10 @@ th {
 
   #mainContainer {
     padding: 0 !important;
+  }
+
+  #scoreCard {
+    font-size: 12px;
   }
 
 }
