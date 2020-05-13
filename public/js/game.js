@@ -26,6 +26,9 @@ var gameData;
  *    - Hide the next round button (made visible when player guesses). 
  */
 $(document).ready(function () {
+    
+    initTouchGestures();
+
     map = L.map('map', { worldCopyJump: true, minZoom: 1.5 }).setView([0, 0], 0);
 
     // Add a tileset to the map - very pretty.
@@ -76,6 +79,27 @@ $(document).ready(function () {
         $('.roundText').text("Round");
     }
 });
+
+/**
+ * Sets up mobile touch gestures for changing stories
+ */
+function initTouchGestures() {
+    // Stop, hammertime
+    var media_content = document.querySelector("#media_content");
+    var hammertime = new Hammer(media_content);
+
+    // Get prev. story when swiping right
+    hammertime.on("swiperight", (e) => {
+        e.preventDefault();
+        prevStory();
+    });
+
+    // Get next story when swiping left
+    hammertime.on("swipeleft", (e) => {
+        e.preventDefault();
+        nextStory();
+    });
+}
 
 /**
  * Loads an existing game and disables guessing, etc.
