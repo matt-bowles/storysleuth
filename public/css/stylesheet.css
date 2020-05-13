@@ -17,3 +17,12 @@ h1, h4 {
 h6 {
   margin: 10em;
 }
+
+
+
+@media only screen and (max-width: 1028px) {
+  #mainContainer {
+    width: 95% !important;
+    margin-top: 12px !important;
+  }
+}

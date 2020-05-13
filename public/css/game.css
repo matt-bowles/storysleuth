@@ -17,12 +17,19 @@ th {
 }
   
 #media_content img, video {
-  width: 281px;
-  height: 500px;
+  width: 100%;
+  height: auto;
+}
+
+/* TODO: this is manually being sized and centred - not very dynamic! */
+#image_display {
+  width: 281px !important;
+  margin-left: 17%;
 }
 
 #timestamp {
   width: 50%;
+  padding-top: 8px;
 }
   
 #btnPlayAgain {
@@ -54,26 +61,13 @@ th {
   content: "R";
 }
 
+/* Mobile-ish media queries */
 @media only screen and (max-width: 1028px) {
 
-  /* tr, thead { float: left; }
-  th, td { 
-    display: block;
-    text-align: center;
+  #mainContainer {
+    padding: 0 !important;
   }
 
-
-  td {
-    height: 50px;
-  }
-  
-  tbody {
-    width: 50% !important;
-  }
-
-  #scoreCard {
-    width: 100%;
-  } */
 }
 
 #scoreCard, #buttons-timestamp-container {
@@ -82,4 +76,9 @@ th {
 
 #story-buttons {
   margin: 0, auto;
+}
+
+.parent {
+  display: flex;
+  flex-wrap: wrap;
 }
