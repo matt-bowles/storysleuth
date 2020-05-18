@@ -51,22 +51,29 @@ const Game = module.exports = mongoose.model('Game', gameSchema);
 
 // Generate a game
 module.exports.generateGame = (req, numRounds=5) => {
-  return new Promise(function(resolve, reject) {
+  console.log();  // Log a blank for console clarity
+  
+  return new Promise(async function(resolve, reject) {
     
+    // Essentially the "game" - a collection of rounds
     var rounds = []; 
-
-    // Populate rounds array
-    for (i=0; i<numRounds; i++) {
-      rounds.push(Playlist.getPlaylist(req.query, 0));
+    
+    // Populate game with as many rounds as required (dictated by numRounds)
+    while (rounds.length < numRounds) {
+      try {
+        let round = await Playlist.getPlaylist(req.query)
+        rounds.push(round);
+      } catch (err) {
+        console.log("Error - too many requests, not enough successful playlists");
+        return reject(err);
+      }
     }
-
-    console.log();
-
+    
+    // Save game to database and fulfill promise
     Promise.all(rounds).then((game) => {
-
-      // Save game to db here
       addGame(game, (err, g) => {
         if (err) console.log(err);
+        console.log("Game generated!");
         resolve(g);
       })
     })

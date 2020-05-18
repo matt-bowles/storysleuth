@@ -215,10 +215,13 @@ app.get('/api/playlist', (req, res) => {
 });
 
 // Generate new game - GET
-app.get('/api/game', (req, res) => {
-  Game.generateGame(req).then((game) => {
-    res.send(game);
-  })
+app.get('/api/game', async (req, res) => {
+  try {
+    let game = await Game.generateGame(req);
+    return res.send(game);
+  } catch (error) {
+    return res.status(500).json(error);    
+  }
 });
 
 // View game - GET

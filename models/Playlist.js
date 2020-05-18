@@ -19,53 +19,34 @@ var numStories = 5;     // the min. amount of stories a successful playlist must
  * Returns a playlist contains zero or many 'stories' for a given city
  * @param {*} city  The city for which the stories will be searched for
  */
-module.exports.getPlaylist = (req, timeoutCount, re, rj) => {
-  return new Promise(function(resolve, reject){
+module.exports.getPlaylist = (req) => {
+  return new Promise(async function(resolve, reject) {
+    var pl;
+    var city;
+    var timeoutCount = 0;
+    
+    // Repeat until timeout count is hit - prevents the server from sending too many requests to the Snapchat servers
+    while (timeoutCount <= 2) {
+      city = await getCity(req);
 
-    // If the original promise is being *passed down*, use that instead
-    if (re !== undefined) resolve = re;
+      // A playlist that contains stories (i.e. a set of related clues for a single location)
+      pl = await snapMap.getPlaylist(city.lat, city.lng, RADIUS, ZOOM);
+      
+      console.log(`${city.city}, ${city.country} - ${pl.totalCount} stories found!`);
 
-    if (rj !== undefined) reject = rj
-
-
-    if (!(timeoutCount < 5)) {
-      reject("Timed out - try again.");
-      return;
-    }
-  
-    getCity(req).then((city) => {
-      if (req.numStories && req.numStories > 0 && req.numStories < 100) {
-        numStories = req.numStories;
+      // If stories exist, and the playlist contains the min. amount of stories...
+      if (!isNaN(pl.totalCount) && pl.totalCount >= numStories) {
+        pl = await processPlaylist(pl, city);
+        return resolve(pl);
       }
+      else {
+        timeoutCount++;
+      }
+    }
     
-      snapMap.getPlaylist(city.lat, city.lng, RADIUS, ZOOM)
-        .then((pl) => { 
-          console.log(city.city + ", " + city.country + " - " + pl.totalCount + " stories found!");
-    
-          // If stories exist, and the playlist contains the min. amount of stories...
-          if (!isNaN(pl.totalCount) && pl.totalCount >= numStories) {
-            // console.log("Successful city found!");
-              // Process the playlist - e.g. get timestamp, URLS, etc.
-              processPlaylist(pl, city).then((pl) => {
-                resolve(pl);
-              });
-          } 
-    
-          // Not enough stories, find new city
-          else {
-            // console.log("Finding a new city...");
-
-            // Re-call the function, pass the original promise-resolve down
-            // (this is so that the original promise request is answered)
-            module.exports.getPlaylist(req, ++timeoutCount, resolve, reject)
-            .catch((err) => {
-              reject(err)
-            });
-          }
-        })
-        .catch((err) => { console.log(err) });
-    });
-  });
+    // Timeout count hit
+    reject({err: "Please refresh the page. We apologise for the inconvenience."});
+  })
 }
 
 /**
