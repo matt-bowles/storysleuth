@@ -76,6 +76,11 @@ th {
     font-size: 12px;
   }
 
+  /* Temporary fix so that round buttons can be pressed */
+  .parent {
+    margin-bottom: 20%;
+  }
+
 }
 
 #scoreCard, #buttons-timestamp-container {
