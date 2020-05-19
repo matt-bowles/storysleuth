@@ -12,6 +12,30 @@
         <span class="clearfix text-center m-4 text-danger" id="errorText"></span>
         <a href="./" class="btn btn-primary w-25">Back</a>
         <button type="submit" id="submitBtn" class="btn btn-primary w-25">Update details</button>
-        <button type="submit" id="submitBtn" class="btn btn-danger w-25">Delete account</button>
+        <button id="deleteBtn" class="btn btn-danger w-25">Delete account</button>
     </div>    
 </form>
+
+<script>
+    $("#deleteBtn").click((e) => {
+        e.preventDefault();
+        bootbox.confirm({ 
+            size: "small",
+            message: "Are you sure?",
+            callback: deleteAccount
+        });
+    });
+
+    function deleteAccount(result) {
+        if (!result) return;
+        
+        axios.post(`/players/{{ acc._id }}/delete`)
+        .then((res) => {
+            // Redirect to homepage
+            window.location.href = "/";
+        })
+        .catch((err) => {
+            bootbox.alert("Something went wrong - please try again later.");
+        });
+    }
+</script>

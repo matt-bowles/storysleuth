@@ -161,6 +161,25 @@ app.post('/players/:id/settings', async (req, res) => {
   }
 });
 
+/**
+ * Permanently delete a user's account and redirect to homepage. How unfortunate.
+ */
+app.post('/players/:id/delete', async (req, res) => {
+  // User is either not logged in, or logged into the wrong account
+  if (req.isUnauthenticated() || req.user._id !== req.params.id) {
+    res.sendStatus(401);
+  }
+
+  try {
+    req.logout();
+    await Account.deleteOne({ _id: req.params.id });
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
 // Account - POST
 app.post('/signup/', (req, res) => {
 
