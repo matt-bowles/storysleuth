@@ -50,9 +50,12 @@ const gameSchema = mongoose.Schema({
 const Game = module.exports = mongoose.model('Game', gameSchema);
 
 // Generate a game
-module.exports.generateGame = (req, numRounds=5) => {
+module.exports.generateGame = (req, numRounds) => {
   console.log();  // Log a blank for console clarity
   
+  // Allow numRounds to be specified through the request (5 by default)
+  numRounds = req.numRounds > 0 && req.numRounds <= 10 ? req.numRounds : 5;
+
   return new Promise(async function(resolve, reject) {
     
     // Essentially the "game" - a collection of rounds

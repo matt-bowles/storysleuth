@@ -13,13 +13,15 @@ var path = require('path');
 // Constants
 const RADIUS = 3000;    // in metres
 const ZOOM = 2;         // between 2-18
-var numStories = 5;     // the min. amount of stories a successful playlist must have
 
 /**
  * Returns a playlist contains zero or many 'stories' for a given city
  * @param {*} city  The city for which the stories will be searched for
  */
 module.exports.getPlaylist = (req) => {
+
+  // The min. amount of stories a successful playlist must have
+  numStories = req.numStories > 0 && req.numstories <=15 ? req.numStories : 5;
 
   return new Promise(async function(resolve, reject) {
     var pl, city;
