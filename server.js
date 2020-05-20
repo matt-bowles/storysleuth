@@ -236,7 +236,7 @@ app.get('/api/playlist', (req, res) => {
 // Generate new game - GET
 app.get('/api/game', async (req, res) => {
   try {
-    let game = await Game.generateGame(req);
+    let game = await Game.generateGame(req.body);
     return res.send(game);
   } catch (error) {
     return res.status(500).json(error);    

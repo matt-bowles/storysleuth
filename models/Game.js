@@ -61,8 +61,7 @@ module.exports.generateGame = (req, numRounds=5) => {
     // Populate game with as many rounds as required (dictated by numRounds)
     while (rounds.length < numRounds) {
       try {
-        let round = await Playlist.getPlaylist(req.query)
-        rounds.push(round);
+        rounds.push(await Playlist.getPlaylist(req));
       } catch (err) {
         console.log("Error - too many requests, not enough successful playlists");
         return reject(err);

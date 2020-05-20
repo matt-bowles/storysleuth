@@ -20,14 +20,17 @@ var numStories = 5;     // the min. amount of stories a successful playlist must
  * @param {*} city  The city for which the stories will be searched for
  */
 module.exports.getPlaylist = (req) => {
+
   return new Promise(async function(resolve, reject) {
-    var pl;
-    var city;
+    var pl, city;
     var timeoutCount = 0;
     
     // Repeat until timeout count is hit - prevents the server from sending too many requests to the Snapchat servers
     while (timeoutCount <= 2) {
-      city = await getCity(req);
+      city = await getCity({ 
+        include: req.include ? req.include.map(c => c.toLowerCase()) : null,
+        exclude: req.exclude ? req.exclude.map(c => c.toLowerCase()) : null,
+       });
 
       // A playlist that contains stories (i.e. a set of related clues for a single location)
       pl = await snapMap.getPlaylist(city.lat, city.lng, RADIUS, ZOOM);
@@ -51,47 +54,38 @@ module.exports.getPlaylist = (req) => {
 
 /**
  * Pulls a random city JSON object from cities.json.
+ * @param options An object containing the following options:
+ *        - include: an array of lowercase country names
+ *        - exclude: an array of lowercase country names
  */
-function getCity(req) {
+function getCity (options) {
   
   return new Promise(function(resolve, reject) {
-    let i=0;
-    let condition = i>0;
-  
-    if (req.include) {
-      var countries = req.include.split(",");
-      var included = countries.map(function(c){ return c.toUpperCase() });
-      condition = "(!included.includes(city.country.toUpperCase()))";
-    }
-  
-    else if (req.exclude) {
-      var countries = req.exclude.split(",");
-      var excluded = countries.map(function(c){ return c.toUpperCase() });
-      condition = "(excluded.includes(city.country.toUpperCase()))";
-    }
-  
-    // Find random city and print it
-    do {
-      var city = cities[Math.floor(Math.random()*cities.length)];
-      // console.log(city.city + ", " + city.country);
-  
-      i++;
-    } 
-  
+
+    let filtered = cities;
     
-    while (eval(condition));
-  
-    resolve(city);
+    if (options.include) {
+      filtered = cities.filter(c => (options.include).includes(c.country.toLowerCase()));
+    } else if (options.exclude) {
+      filtered = cities.filter(c => !(options.exclude).includes(c.country.toLowerCase()));
+    }
+
+    let city = filtered[Math.floor(Math.random()*filtered.length)];
+
+    if (city) {
+      resolve(city);
+    } else {
+      reject("No city found with provided options");
+    }
   });
 }
 
 /**
  * 
  * @param {*} playlist  The playlist containing stories.
- * @param {*} res       The response object to be sent back to the client.
  * @param {*} city      The name of the city 
  */
-function processPlaylist(playlist, city, _callback) {
+function processPlaylist(playlist, city) {
   return new Promise(function(resolve, reject) {
     stories = [];   // Holds minStories amount of stories
     story_ids = [];
@@ -132,7 +126,6 @@ function processPlaylist(playlist, city, _callback) {
       }
     }
   
-    // console.log(city.city + ", " + city.country + " - " + playlist.totalCount + " stories found!");
     addCity(city); 
   
     // Initalise playlist object
