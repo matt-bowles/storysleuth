@@ -28,7 +28,7 @@ module.exports.getPlaylist = (req) => {
     var timeoutCount = 0;
     
     // Repeat until timeout count is hit - prevents the server from sending too many requests to the Snapchat servers
-    while (timeoutCount <= 2) {
+    while (timeoutCount <= 5) {
       city = await getCity({ 
         include: req.include ? req.include.map(c => c.toLowerCase()) : null,
         exclude: req.exclude ? req.exclude.map(c => c.toLowerCase()) : null,
@@ -37,11 +37,13 @@ module.exports.getPlaylist = (req) => {
       // A playlist that contains stories (i.e. a set of related clues for a single location)
       pl = await snapMap.getPlaylist(city.lat, city.lng, RADIUS, ZOOM);
       
-      console.log(`${city.city}, ${city.country} - ${pl.totalCount} stories found!`);
-
+      try {
+        console.log(`${city.city}, ${city.country} - ${pl.elements.length} stories found!`);
+      } catch (error) {}
+      
       // If stories exist, and the playlist contains the min. amount of stories...
-      if (!isNaN(pl.totalCount) && pl.totalCount >= numStories) {
-        pl = await processPlaylist(pl, city);
+      if (pl.elements && pl.elements.length >= numStories) {
+        pl = await processPlaylist(pl.elements, city);
         return resolve(pl);
       }
       else {
@@ -91,39 +93,39 @@ function processPlaylist(playlist, city) {
   return new Promise(function(resolve, reject) {
     stories = [];   // Holds minStories amount of stories
     story_ids = [];
-  
+
     // Get random stories from playlist
     for (var i=0; i<numStories; i++) {
   
       // Make sure that the story hasn't already been picked.
       do {
-        var num = [Math.floor(Math.random()*playlist.totalCount)]; 
-      } while (story_ids.includes(playlist.elements[num].id));
+        var num = [Math.floor(Math.random()*playlist.length)]; 
+      } while (story_ids.includes(playlist[num].id));
   
       stories.push({});
-      story_ids.push(playlist.elements[num].id);
+      story_ids.push(playlist[num].id);
   
       // Get timestamp for each story - How long ago was the story posted?
-      let timestamp = playlist.elements[num].timestamp;
+      let timestamp = playlist[num].timestamp;
       stories[i].timestamp = timeago.format(timestamp);
   
       // It's a video
-      if (playlist.elements[num].snapInfo.streamingMediaInfo) {
+      if (playlist[num].snapInfo.streamingMediaInfo) {
         // Find suffix (depending whether there is an overlay or not)
-        var suffix = playlist.elements[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl 
+        var suffix = playlist[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl 
         // -- video has snapchat overlay --
-        ? playlist.elements[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl
+        ? playlist[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl
         // -- video doesn't have overlay --
-        : playlist.elements[num].snapInfo.streamingMediaInfo.mediaUrl;
+        : playlist[num].snapInfo.streamingMediaInfo.mediaUrl;
   
-        stories[i].storyURL = playlist.elements[num].snapInfo.streamingMediaInfo.prefixUrl + suffix;
+        stories[i].storyURL = playlist[num].snapInfo.streamingMediaInfo.prefixUrl + suffix;
   
         stories[i].isImage = false;
       } 
       
       // It's an image
       else {
-        stories[i].storyURL = playlist.elements[num].snapInfo.publicMediaInfo.publicImageMediaInfo.mediaUrl;
+        stories[i].storyURL = playlist[num].snapInfo.publicMediaInfo.publicImageMediaInfo.mediaUrl;
         stories[i].isImage = true;
       }
     }
