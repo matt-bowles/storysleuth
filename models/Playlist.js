@@ -43,8 +43,11 @@ module.exports.getPlaylist = (req) => {
       
       // If stories exist, and the playlist contains the min. amount of stories...
       if (pl.elements && pl.elements.length >= numStories) {
+
+        data = pl;
+
         pl = await processPlaylist(pl.elements, city);
-        return resolve(pl);
+        return resolve({playlist: pl, data});
       }
       else {
         timeoutCount++;
@@ -108,15 +111,17 @@ function processPlaylist(playlist, city) {
       // Get timestamp for each story - How long ago was the story posted?
       let timestamp = playlist[num].timestamp;
       stories[i].timestamp = timeago.format(timestamp);
+
+      console.log(playlist[num].snapInfo.snapMediaType);
   
       // It's a video
-      if (playlist[num].snapInfo.streamingMediaInfo) {
+      if (playlist[num].snapInfo.snapMediaType) {
         // Find suffix (depending whether there is an overlay or not)
-        var suffix = playlist[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl 
+        var suffix = playlist[num].snapInfo.streamingMediaInfo.overlayUrl 
         // -- video has snapchat overlay --
-        ? playlist[num].snapInfo.streamingMediaInfo.mediaWithOverlayUrl
+        ? "embedded.mp4"
         // -- video doesn't have overlay --
-        : playlist[num].snapInfo.streamingMediaInfo.mediaUrl;
+        : "media.mp4";
   
         stories[i].storyURL = playlist[num].snapInfo.streamingMediaInfo.prefixUrl + suffix;
   
