@@ -48,7 +48,7 @@ module.exports.getPlaylist = (req) => {
 
         pl = await processPlaylist(pl.elements, city);
 
-        return resolve({playlist: pl });
+        return resolve(pl);
       }
       else {
         timeoutCount++;

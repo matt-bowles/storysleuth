@@ -52,7 +52,7 @@ $(document).ready(function () {
     if (gameData) {
         // Extract info from gameData, so that it can be used with existing functions
         gameData = JSON.parse(gameData)[0];
-        game = gameData.game.rounds;
+        game = gameData.game;
         roundGuesses = gameData.roundScores;
         playlist = gameData.game.rounds[0];
 
@@ -61,6 +61,9 @@ $(document).ready(function () {
     // New game is being played, let the user make guesses, etc.
     else {
         map.on('click', function(e) {
+            // Prevent player from making guess if round hasn't been loaded yet
+            if (!playlist.coords) return;
+
             playerGuessLat = e.latlng.lat;
             playerGuessLng = e.latlng.lng;
             placeGuessMarker(playerGuessLat, playerGuessLng);
@@ -141,9 +144,9 @@ function postGame() {
     cols.forEach((col) => {
         col.addEventListener('click', () => {
             let i = cols.findIndex(c => c == col);
-            playlist = game[i];
+            playlist = game.rounds[i];
             showStory();
-            map.setView([game[i].coords.lat, game[i].coords.lng], 15);
+            map.setView([game.rounds[i].coords.lat, game.rounds[i].coords.lng], 15);
         })
     });
 }
@@ -338,13 +341,14 @@ function lineBetweenTwoMarkers(m1, m2) {
  * To be called at the end of a game, when all rounds are finished.
  */
 function drawGameSummary() {
-    for (var i = 0; i < game.length; i++) {
+    for (var i = 0; i < game.rounds.length; i++) {
+
         // Add locations to map
-        var actualLocMarker = L.marker([game[i].coords.lat, game[i].coords.lng], { icon: locIcon }).addTo(map);
+        var actualLocMarker = L.marker([game.rounds[i].coords.lat, game.rounds[i].coords.lng], { icon: locIcon }).addTo(map);
         var guessLocMarker = L.marker([roundGuesses[i].guessLat, roundGuesses[i].guessLng]).addTo(map);
 
-        if (game[i].location) {
-            createTooltip(actualLocMarker, game[i].location);
+        if (game.rounds[i].location) {
+            createTooltip(actualLocMarker, game.rounds[i].location);
         }
 
         allMarkers.push(actualLocMarker);
@@ -358,10 +362,10 @@ function drawGameSummary() {
 function initaliseNewRound() {
     $('#nextRoundBtn').hide();
     $('#guessResult').hide();
-    $('#prevBtn').attr('disabled', false);
+    $('#prevBtn').attr('disabled', true);
 
     storyCounter = 0;
-    playlist = game[round].playlist;
+    playlist = game.rounds[round];
     showStory();
 
     // Only fix up the map if it has been tampered with (i.e. if it's not the first round).
