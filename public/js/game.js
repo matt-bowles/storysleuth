@@ -361,7 +361,7 @@ function initaliseNewRound() {
     $('#prevBtn').attr('disabled', false);
 
     storyCounter = 0;
-    playlist = game[round];
+    playlist = game[round].playlist;
     showStory();
 
     // Only fix up the map if it has been tampered with (i.e. if it's not the first round).
@@ -385,7 +385,8 @@ function initaliseNewGame() {
 
     // Load new game
     axios.get('/api/game').then((g) => {
-        game = g.data.rounds;
+
+        game = g.data;
         gameId = g.data._id;
         initaliseNewRound();
     });

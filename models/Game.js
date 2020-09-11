@@ -72,12 +72,16 @@ module.exports.generateGame = (req, numRounds) => {
     }
     
     // Save game to database and fulfill promise
-    Promise.all(rounds).then((game) => {
-      addGame(game, (err, g) => {
-        if (err) console.log(err);
+    Promise.all(rounds).then(async (game) => {
+
+      try {
+        await addGame(game);
         console.log("Game generated!");
-        resolve(g);
-      })
+        resolve(game);  
+      } catch (err) {
+        console.log(err);
+      }
+
     })
   });
 }
@@ -88,13 +92,17 @@ module.exports.getGameById = (id, callback) => {
 }
 
 // Add a game
-function addGame(game, callback) {
-  var g = {};
-  g.rounds = [];
+function addGame(game) {
 
-  game.forEach(round => {
-    g.rounds.push(round);
+  return new Promise((resolve, reject) => {
+    var g = {};
+    g.rounds = [];
+  
+    game.forEach(round => {
+      g.rounds.push(round);
+    });
+
+    Game.create(g, (err) => reject(err));
+    resolve(g);
   });
-
-  Game.create(g, callback);
 }

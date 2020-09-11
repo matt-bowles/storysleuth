@@ -290,3 +290,8 @@ function getSessionInfo(req) {
 // Run the web server using Express
 var port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`The application is running on localhost:${port}!`));
+
+
+// var job = schedule.scheduleJob("* * * * *", function() {
+//   // Playlist.getPlaylist()
+// });

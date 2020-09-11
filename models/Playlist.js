@@ -47,7 +47,8 @@ module.exports.getPlaylist = (req) => {
         data = pl;
 
         pl = await processPlaylist(pl.elements, city);
-        return resolve({playlist: pl, data});
+
+        return resolve({playlist: pl });
       }
       else {
         timeoutCount++;
@@ -111,8 +112,6 @@ function processPlaylist(playlist, city) {
       // Get timestamp for each story - How long ago was the story posted?
       let timestamp = playlist[num].timestamp;
       stories[i].timestamp = timeago.format(timestamp);
-
-      console.log(playlist[num].snapInfo.snapMediaType);
   
       // It's a video
       if (playlist[num].snapInfo.snapMediaType) {
@@ -143,7 +142,7 @@ function processPlaylist(playlist, city) {
     playlist.coords = {lat: city.lat, lng: city.lng};
     playlist.stories = stories;
     playlist.location = {city: city.city, country: city.country};
-  
+
     resolve(playlist);
   });
 }
