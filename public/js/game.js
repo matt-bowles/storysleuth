@@ -145,6 +145,8 @@ function postGame() {
         col.addEventListener('click', () => {
             let i = cols.findIndex(c => c == col);
             playlist = game.rounds[i];
+            storyCounter = 0;
+            $('#prevBtn').attr("disabled", "true");
             showStory();
             map.setView([game.rounds[i].coords.lat, game.rounds[i].coords.lng], 15);
         })
