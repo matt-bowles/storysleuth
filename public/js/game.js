@@ -170,7 +170,6 @@ function placeGuessMarker(lat, lng) {
 
         // Allow user to make guess
         $('#guessButton').attr("disabled", false);
-        $('#guessButton').removeClass("btn-danger");
         $('#guessButton').addClass("btn-success");
     }
 }
@@ -275,6 +274,8 @@ function makeGuess(){
         // (so that they can be submitted to the API when the game finishes)
         roundGuesses.push({roundScore: Math.floor(dist), guessLat: playerGuessLat, guessLng: playerGuessLng});
 
+        $('#guessButton').hide();
+
         // If the player still has more rounds left, show the next round button.
         if (round < playlist.stories.length) {
             $('#nextRoundBtn').show();
@@ -296,7 +297,7 @@ function makeGuess(){
             body: JSON.stringify({score: score, roundScores: roundGuesses, gameId: gameId})
             });
 
-            $('#mainContainer').prepend("<h1 id='btnPlayAgain' onclick='resetGame()'>Play again?</h1>");
+            $('#btnPlayAgain').removeAttr("hidden");
         }
     }
 }
@@ -362,6 +363,7 @@ function drawGameSummary() {
 function initaliseNewRound() {
     $('#nextRoundBtn').hide();
     $('#guessResult').hide();
+    $('#guessButton').show();
     $('#prevBtn').attr('disabled', true);
 
     storyCounter = 0;
@@ -404,7 +406,7 @@ function initaliseNewGame() {
  */ 
 function resetGame() {
     // Remove btn
-    $('#btnPlayAgain').remove();
+    $('#btnPlayAgain').attr("hidden", true);
 
     $('#guessResult').hide();
 
