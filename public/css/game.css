@@ -17,14 +17,13 @@ th {
 }
   
 #media_content img, video {
-  width: 100%;
-  height: auto;
+  width: 100% 100%;
 }
 
 /* TODO: this is manually being sized and centred - not very dynamic! */
 #image_display {
-  width: 281px !important;
-  margin-left: 17%;
+  width: 100% 100% !important;
+  /* margin-left: 17%; */
 }
 
 #timestamp {

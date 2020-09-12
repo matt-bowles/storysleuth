@@ -1,5 +1,5 @@
 {{!-- Guess result goes here (hidden by default) --}}
-<div class="row text-center" id="guessResult" style="display: none"></div>
+{{!-- <div class="row text-center" id="guessResult" style="display: none"></div> --}}
 
   {{!-- Main container--}}
   <div class="parent">
@@ -17,7 +17,7 @@
         <div id="buttons-timestamp-container">
           <!-- Story nav buttons -->
           <div id="story-buttons">
-            <button id="prevBtn" class="btn btn-outline-dark" onclick="prevStory()">◄ Prev</button>
+            <button id="prevBtn" class="btn btn-outline-dark" onclick="prevStory()" disabled="disabled">◄ Prev</button>
             <button id="nextBtn" class="btn btn-outline-dark" onclick="nextStory()">Next ►</button>
           </div>
           <h5 id="timestamp">Loading...</h5> 
@@ -32,8 +32,9 @@
       <div id="map"></div>
 
       <div class="mt-3">
-        <button type="button" class="btn btn-danger" id="guessButton" onclick="makeGuess()" disabled>Make guess</button>
+        <button type="button" class="btn btn-success" id="guessButton" onclick="makeGuess()" disabled="disabled">Make guess</button>
         <button type="button" class="btn btn-primary" id="nextRoundBtn" onclick="initaliseNewRound()">Next round</button>   
+        <button type="button" class="btn btn-primary" id="btnPlayAgain" onclick="resetGame()" hidden>Play again?</button>   
       </div>
       
     </div>
