@@ -263,8 +263,15 @@ function makeGuess(){
         var dist = getDistanceFromLatLonInKm(playlist.coords.lat, playlist.coords.lng, playerGuessLat, playerGuessLng);
         let roundScore = calcScore(dist);
 
-        $('#guessResult').show();
+        $('#postRound').show().children().show();
+        $('#postRound').attr('hidden', false)
         $('#guessResult').html(`Your guess was⠀<b>${dist} km</b>⠀away from the correct location. You earned⠀<b>${roundScore}</b>⠀points this round.`);
+
+        // Animate the progress bar according to player's score
+        setTimeout(() => {
+            $('#prog').css('width', `${(roundScore/5000)*100}%`);
+        }, 250);   // ms
+
 
         // Fly to actual location
         map.flyTo(markers['locMarker'].getLatLng());
@@ -366,7 +373,8 @@ function drawGameSummary() {
 
 function initaliseNewRound() {
     $('#nextRoundBtn').hide();
-    $('#guessResult').hide();
+    $('#postRound').hide();
+    $('#prog').css('width', '0%');
     $('#guessButton').show();
     $('#prevBtn').attr('disabled', true);
 
@@ -400,7 +408,6 @@ function initaliseNewGame() {
         initaliseNewRound();
     })
     .catch((e) => {
-        console.log("Hi!");
         bootbox.alert({title: "Please refresh the page", 
         message: "This mechanism has been implemented as a safeguard to prevent SnapChat from getting angry with me.\n I apologise for the inconvenience."});
     });

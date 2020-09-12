@@ -6,7 +6,8 @@
   min-height: 500px;
 }
 
-#guessResult {
+/* Contains #guessResult, #prog */
+#postRound {
   margin: auto;
   width: 75%;
   margin-bottom: 25px;
@@ -43,6 +44,12 @@ th {
 
 #scoreCard {
   width: 100%;
+  border: black 2px solid;
+  background-color: rgba(255, 255, 240, 0.863);
+}
+
+table, th, td {
+  border: 1px solid black;
 }
 
 .scorecardHover {
@@ -53,7 +60,6 @@ th {
 /* Flex stuff */
 #mainContainer {
   height: 100%;
-  background-color: lightblue;
   /* display: flex; */
   flex-direction: column;
   justify-content: space-evenly;
@@ -105,7 +111,14 @@ th {
   margin: 0, auto;
 }
 
+#timestamp {
+  margin: auto; 
+}
+
 .parent {
   display: flex;
   flex-wrap: wrap;
+  border: black 4px solid;
+  padding: 1rem;
+  border-radius: 10px;
 }

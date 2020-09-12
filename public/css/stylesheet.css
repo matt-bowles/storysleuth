@@ -4,6 +4,15 @@
   font-family: 'Comfortaa', Arial, Helvetica, sans-serif;
 }
 
+#mainContainer {
+  -webkit-box-shadow: 9px 10px 30px 1px rgba(0,0,0,0.75);
+  -moz-box-shadow: 9px 10px 30px 1px rgba(0,0,0,0.75);
+  box-shadow: 9px 10px 30px 1px rgba(0,0,0,0.75);
+  border-radius: 10px;
+
+  background-color: #bcf4fa;
+}
+
 body {
   background-image: linear-gradient(141deg, #9fb8ad 0%, #1fc8db 51%, #2cb5e8 75%);
   /* height: 2000px; */
@@ -23,7 +32,16 @@ h6 {
   margin: 10em;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  pointer-events: all !important;
+}
 
+button {
+  -webkit-box-shadow: 28px 24px 43px -17px rgba(0,0,0,0.52);
+  -moz-box-shadow: 28px 24px 43px -17px rgba(0,0,0,0.52);
+  box-shadow: 28px 24px 43px -17px rgba(0,0,0,0.52);
+}
 
 @media only screen and (max-width: 1028px) {
   #mainContainer {

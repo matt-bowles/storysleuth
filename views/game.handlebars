@@ -1,5 +1,13 @@
 {{!-- Guess result goes here (hidden by default) --}}
-<div class="row" id="guessResult" style="display: none"></div>
+<div class="row" id="postRound" hidden>
+  <div class="row justify-content-center" id="guessResult" style="margin: auto;"></div>
+
+  <div class="progress mt-2" style="width: 66%; margin: auto;">
+    <div id="prog" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+
+</div>
+  
 
   {{!-- Main container--}}
   <div class="parent">
@@ -19,8 +27,8 @@
         <div id="buttons-timestamp-container">
           <!-- Story nav buttons -->
           <div id="story-buttons" style="margin-left: auto">
-            <button id="prevBtn" class="btn btn-outline-dark" onclick="prevStory()" disabled="disabled" style="width: 49%">◄ Prev. clue</button>
-            <button id="nextBtn" class="btn btn-outline-dark" onclick="nextStory()" style="width: 49%">Next clue ►</button>
+            <button id="prevBtn" class="btn btn-info" onclick="prevStory()" disabled="disabled" style="width: 49%">◄ Prev. clue</button>
+            <button id="nextBtn" class="btn btn-info" onclick="nextStory()" style="width: 49%">Next clue ►</button>
           </div>
           <h5 id="timestamp">Loading...</h5> 
         </div>
