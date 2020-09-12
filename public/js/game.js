@@ -468,5 +468,7 @@ function clearMap() {
  * @param {*} dist distance between guess and actual location in km
  */
 function calcScore(dist) {
-    return Math.floor((10/dist)*5000);
+    let score = Math.floor((10/dist)*5000)
+    if (score > 5000) score = 5000;
+    return score;
 }
