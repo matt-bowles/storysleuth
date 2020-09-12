@@ -15,6 +15,12 @@
 
 #scoreCard {
   margin-left: 3.5%;
+  text-align: center;
+}
+
+.currentRoundCol {
+  text-decoration: underline;
+  font-size: 110%;
 }
 
 th {

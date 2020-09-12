@@ -388,6 +388,9 @@ function initaliseNewRound() {
     }
 
     round++;
+
+    $(`#scoreCard > tbody:nth-child(1) > tr:nth-child(1) td:nth-child(${round - 1})`).removeClass('currentRoundCol');
+    $(`#scoreCard > tbody:nth-child(1) > tr:nth-child(1) td:nth-child(${round})`).addClass('currentRoundCol');
 }
 
 /**
@@ -397,6 +400,7 @@ function initaliseNewRound() {
 function initaliseNewGame() {
     $('#nextRoundBtn').hide();
     $('#prevBtn').attr('disabled', false);
+    $(`#scoreCard > tbody:nth-child(1) > tr:nth-child(1) td:nth-child(5)`).removeClass('currentRoundCol');
 
     // Remove post-game functionality, just incase...
     $(`#scoreCard tr`).unbind();
