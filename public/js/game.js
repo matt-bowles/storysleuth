@@ -33,7 +33,7 @@ $(document).ready(function () {
 
     // Add a tileset to the map - very pretty.
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
     }).addTo(map);
 
     // Define custom icon for actual location.
@@ -267,12 +267,14 @@ function makeGuess(){
         // Fly to actual location
         map.flyTo(markers['locMarker'].getLatLng());
 
+        let roundScore = calcScore(dist)
+
         // Update (append) score using the distance between guess and the actual location.
-        updateScore(Math.floor(dist));
+        updateScore(roundScore);
         
         // Save round score and play guess coordinates.
         // (so that they can be submitted to the API when the game finishes)
-        roundGuesses.push({roundScore: Math.floor(dist), guessLat: playerGuessLat, guessLng: playerGuessLng});
+        roundGuesses.push({roundScore, guessLat: playerGuessLat, guessLng: playerGuessLng});
 
         $('#guessButton').hide();
 
@@ -453,4 +455,12 @@ function clearMap() {
 
     // Ensures that the first story will be loaded in the round.
     storyCounter = 0;
+}
+
+/**
+ * Calculates a score for a round - ranges between 5000 and 0
+ * @param {*} dist distance between guess and actual location in km
+ */
+function calcScore(dist) {
+    return Math.floor((10/dist)*5000);
 }

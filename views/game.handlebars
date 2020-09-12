@@ -5,20 +5,22 @@
   <div class="parent">
 
     {{!-- Media player --}}
-    <div class="p-2 border border-dark flex-fill" style="width: 25%">
+    <div class="p-2 border border-dark flex" id="idklmao">
       <div id="media_content" class="embed-responsive">
         <img id="image_display" src="/img/loading.png" class="embed-responsive-item">
         <video controls id="video_player" style="display: none" class="embed-responsive-item">
         </video>
       </div>
       <!-- Start with default story - no. 0 in json array -->
-    
+
+      <hr>
+
       <div class="mt-3" >
         <div id="buttons-timestamp-container">
           <!-- Story nav buttons -->
-          <div id="story-buttons">
-            <button id="prevBtn" class="btn btn-outline-dark" onclick="prevStory()" disabled="disabled">◄ Prev</button>
-            <button id="nextBtn" class="btn btn-outline-dark" onclick="nextStory()">Next ►</button>
+          <div id="story-buttons" style="margin-left: auto">
+            <button id="prevBtn" class="btn btn-outline-dark" onclick="prevStory()" disabled="disabled" style="width: 49%">◄ Prev</button>
+            <button id="nextBtn" class="btn btn-outline-dark" onclick="nextStory()" style="width: 49%">Next ►</button>
           </div>
           <h5 id="timestamp">Loading...</h5> 
         </div>

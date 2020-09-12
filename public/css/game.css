@@ -1,5 +1,9 @@
+.container {
+  min-width: auto !important;
+}
+
 #map, #media_content:nth-child(1) {
-  height: 500px;
+  min-height: 500px;
 }
 
 #guessResult {
@@ -22,7 +26,8 @@ th {
 
 /* TODO: this is manually being sized and centred - not very dynamic! */
 #image_display {
-  width: 100% 100% !important;
+  width: 100% !important;
+  object-fit: scale-down;
   /* margin-left: 17%; */
 }
 
@@ -49,7 +54,7 @@ th {
 #mainContainer {
   height: 100%;
   background-color: lightblue;
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
   justify-content: space-evenly;
 }
@@ -62,6 +67,16 @@ th {
 
 .roundText {
   content: "R";
+}
+
+#idklmao {
+  width: 30%;
+}
+
+@media only screen and (max-width: 600px) {
+  #idklmao {
+    min-width: 100% !important;
+  }
 }
 
 /* Mobile-ish media queries */
