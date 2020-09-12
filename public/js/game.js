@@ -394,11 +394,15 @@ function initaliseNewGame() {
     $(`#scoreCard tr`).unbind();
 
     // Load new game
-    axios.get('/api/game').then((g) => {
-
-        game = g.data;
-        gameId = g.data._id;
+    axios.get('/api/game').then((response) => {
+        game = response.data;
+        gameId = response.data._id;
         initaliseNewRound();
+    })
+    .catch((e) => {
+        console.log("Hi!");
+        bootbox.alert({title: "Please refresh the page", 
+        message: "This mechanism has been implemented as a safeguard to prevent SnapChat from getting angry with me.\n I apologise for the inconvenience."});
     });
 }
 
