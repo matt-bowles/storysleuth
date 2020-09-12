@@ -258,16 +258,18 @@ function makeGuess(){
         createTooltip(markers['locMarker'], playlist.location);
  
         lineBetweenTwoMarkers(markers['guessMarker'], markers['locMarker']);
-        
+
         // Display guess info - how far off was the player?
         var dist = getDistanceFromLatLonInKm(playlist.coords.lat, playlist.coords.lng, playerGuessLat, playerGuessLng);
+        let roundScore = calcScore(dist);
+
         $('#guessResult').show();
-        $('#guessResult').html(`Your guess was <b> ${dist} km</b> away from the correct location.`);
+        $('#guessResult').html(`Your guess was⠀<b>${dist} km</b>⠀away from the correct location. You earned⠀<b>${roundScore}</b>⠀points this round.`);
 
         // Fly to actual location
         map.flyTo(markers['locMarker'].getLatLng());
 
-        let roundScore = calcScore(dist)
+        
 
         // Update (append) score using the distance between guess and the actual location.
         updateScore(roundScore);
