@@ -205,10 +205,8 @@ app.get('/leaderboard', (req, res) => {
 
 // Score - POST
 app.post('/api/score', (req, res) => {
-
-  Score.addScore(req, (err) => {
-    if (err) throw err;
-    res.sendStatus(200);
+  Score.addScore(req, (scoreId) => {
+    res.status(200).send({ scoreId });
   });
 });
 

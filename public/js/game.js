@@ -301,13 +301,14 @@ function makeGuess(){
             postGame();
 
             // Send score to API
-            fetch('/api/score', {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json, text/plain, */*',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({score: score, roundScores: roundGuesses, gameId: gameId})
+            axios.post('/api/score', {score: score, roundScores: roundGuesses, gameId: gameId})
+            .then((response) => {
+                let scoreId = response.data.scoreId;
+
+                $('#scoreLink').attr("href", `/games/${scoreId}`);
+
+                $("#shareBox").show().children().show();
+                $('#shareBox').attr('hidden', false);
             });
 
             $('#btnPlayAgain').removeAttr("hidden");
@@ -361,6 +362,7 @@ function drawGameSummary() {
         var actualLocMarker = L.marker([game.rounds[i].coords.lat, game.rounds[i].coords.lng], { icon: locIcon }).addTo(map);
         var guessLocMarker = L.marker([roundGuesses[i].guessLat, roundGuesses[i].guessLng]).addTo(map);
 
+        // Create tooltip which reveals location name
         if (game.rounds[i].location) {
             createTooltip(actualLocMarker, game.rounds[i].location);
         }
@@ -429,6 +431,8 @@ function resetGame() {
     // Remove btn
     $('#btnPlayAgain').attr("hidden", true);
 
+    $('#shareBox').hide();
+
     $('#guessResult').hide();
 
     // Reset scoreboard
@@ -480,8 +484,16 @@ function clearMap() {
  * Calculates a score for a round - ranges between 5000 and 0
  * @param {*} dist distance between guess and actual location in km
  */
-function calcScore(dist) {
-    let score = Math.floor((10/dist)*5000)
+function calcScore(x) {
+
+    // y=3000*\exp(-x^2/(2*200000))+2000*\exp(-x^2/(2*20000000))
+
+    // y=3000*\exp(-x^{2}/(10*200000))\ +2000*\exp(-x^{2}/(20*2000000))\ 
+
+    let score = Math.floor((10/x)*5000);
     if (score > 5000) score = 5000;
-    return score;
+
+    // let score = 3460 * Math.exp(- Math.pow(2, x) / (2*2000000)) + 1540 * Math.exp(- Math.pow(2, x) / (2*20000000))
+
+    return Math.floor(score);
 }

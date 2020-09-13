@@ -51,5 +51,12 @@ module.exports.addScore = (req, callback) => {
   var accId = (req.isAuthenticated()) ? req.user._id : null;
   score = req.body;
 
-  Score.create({score: score.score, account: accId, roundScores: score.roundScores, game: score.gameId}, callback);
+  Score.create({score: score.score, account: accId, roundScores: score.roundScores, game: score.gameId}, (err, sc) => {
+    if (err) throw err;
+
+    // TODO: ideally this should be sending back an ID of the SCORE object
+    //
+    // Basically, a M:1 relationship between Score and Game
+    callback(sc.game);
+  });
 }
