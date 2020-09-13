@@ -487,7 +487,7 @@ function clearMap() {
 function calcScore(x) {
     // y=3460*\exp(-x^2/(2*2000000))+1540*\exp(-x^2/(2*20000000))
 
-    let score = 3460 * Math.exp(- Math.pow(x, 2) / (2*2000000)) + 1540 * Math.exp(- Math.pow(x, 2) / (2*20000000))
+    let score = 3460 * Math.exp(- Math.pow(x, 2) / (2 * 2000000) ) + 1540 * Math.exp(- Math.pow(x, 2) / (2 * 20000000) );
 
     return Math.ceil(score);
 }
