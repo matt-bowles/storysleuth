@@ -485,15 +485,9 @@ function clearMap() {
  * @param {*} dist distance between guess and actual location in km
  */
 function calcScore(x) {
+    // y=3460*\exp(-x^2/(2*2000000))+1540*\exp(-x^2/(2*20000000))
 
-    // y=3000*\exp(-x^2/(2*200000))+2000*\exp(-x^2/(2*20000000))
+    let score = 3460 * Math.exp(- Math.pow(x, 2) / (2*2000000)) + 1540 * Math.exp(- Math.pow(x, 2) / (2*20000000))
 
-    // y=3000*\exp(-x^{2}/(10*200000))\ +2000*\exp(-x^{2}/(20*2000000))\ 
-
-    let score = Math.floor((10/x)*5000);
-    if (score > 5000) score = 5000;
-
-    // let score = 3460 * Math.exp(- Math.pow(2, x) / (2*2000000)) + 1540 * Math.exp(- Math.pow(2, x) / (2*20000000))
-
-    return Math.floor(score);
+    return Math.ceil(score);
 }
