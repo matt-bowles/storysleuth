@@ -437,8 +437,9 @@ function resetGame() {
     $('#btnPlayAgain').attr("hidden", true);
 
     $('#shareBox').hide();
-
     $('#guessResult').hide();
+    $('#postRound').hide();
+    $('#timestamp').html("Loading...");
 
     // Reset scoreboard
     for (i=1; i<=5; i++) {
