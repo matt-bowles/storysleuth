@@ -213,6 +213,9 @@ function prevStory() {
 function showStory() {
     var story = playlist.stories[storyCounter];
 
+    // Bug fix: pause video, incase the next story is an image
+    $('#video_player').get(0).pause();
+
     if (story.isImage) {
         // Hide video player
         $('#video_player').hide();
