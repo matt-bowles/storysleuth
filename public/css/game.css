@@ -39,8 +39,8 @@ th {
 }
 
 #timestamp {
-  width: 50%;
-  padding-top: 8px;
+  margin-top: 16px;
+  text-align: center;
 }
   
 #btnPlayAgain {
@@ -115,10 +115,6 @@ table, th, td {
 
 #story-buttons {
   margin: 0, auto;
-}
-
-#timestamp {
-  margin: auto; 
 }
 
 .parent {

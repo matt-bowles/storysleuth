@@ -230,7 +230,8 @@ function showStory() {
     }
 
     // Show timestamp.
-    $('#timestamp').text(playlist.stories[storyCounter].timestamp);
+    // e.g. Clue 1/5: 9 hours ago
+    $('#timestamp').html(`<b>Clue ${storyCounter + 1}/${playlist.stories.length}:</b> ${playlist.stories[storyCounter].timestamp}`);
 }
 
 /**
