@@ -37,11 +37,11 @@ button:disabled {
   pointer-events: all !important;
 }
 
-button {
+/* button {
   -webkit-box-shadow: 28px 24px 43px -17px rgba(0,0,0,0.52);
   -moz-box-shadow: 28px 24px 43px -17px rgba(0,0,0,0.52);
   box-shadow: 28px 24px 43px -17px rgba(0,0,0,0.52);
-}
+} */
 
 @media only screen and (max-width: 1028px) {
   #mainContainer {
