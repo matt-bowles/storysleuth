@@ -76,7 +76,6 @@ $(document).ready(function () {
 
     postGame();
 
-
     // Change "round" text to "r" when mobil
     if (window.innerWidth <= 667) {
         $('.roundText').text("R.");
@@ -230,12 +229,16 @@ function showStory() {
         $('#image_display').attr("src", story.storyURL);
         $('#image_display').show();
 
+        // Set up image magnifying glass with blowup.js
+        $("#image_display").blowup({ cursor: false, scale: 0.65, width: 150, height: 150 });
     } else {
         // Hide image
         $('#image_display').hide();
 
         $('#video_player').attr("src", story.storyURL);
         $('#video_player').show();
+
+        
     }
 
     // Show timestamp.
