@@ -28,10 +28,14 @@ module.exports.getPlaylist = (req) => {
     var timeoutCount = 0;
     
     // Repeat until timeout count is hit - prevents the server from sending too many requests to the Snapchat servers
-    while (timeoutCount <= 5) {
+    while (timeoutCount <= 10) {
+
       city = await getCity({ 
-        include: req.include ? req.include.map(c => c.toLowerCase()) : null,
-        exclude: req.exclude ? req.exclude.map(c => c.toLowerCase()) : null,
+        // include: req.include ? req.include.map(c => c.toLowerCase()) : null,
+        // exclude: req.exclude ? req.exclude.map(c => c.toLowerCase()) : null,
+
+        include: req.include ? req.include : null,
+        exclude: req.exclude ? req.exclude : null,
        });
 
       // A playlist that contains stories (i.e. a set of related clues for a single location)
@@ -46,7 +50,7 @@ module.exports.getPlaylist = (req) => {
 
         data = pl;
 
-        pl = await processPlaylist(pl.elements, city);
+        pl = await processPlaylist(pl.elements, city); 
 
         return resolve(pl);
       }
