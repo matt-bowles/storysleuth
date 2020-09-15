@@ -417,6 +417,7 @@ function initaliseNewGame() {
     axios.get('/api/game').then((response) => {
         game = response.data;
         gameId = response.data._id;
+        roundGuesses = [];  // Reset round guesses
         initaliseNewRound();
     })
     .catch((e) => {
