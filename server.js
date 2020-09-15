@@ -57,7 +57,7 @@ var db = mongoose.connection;
 app.use(express.static('public'));
 
 // Use a favicon
-app.use(favicon(path.join(__dirname, 'public', 'img/favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'img/favicon.png')));
 
 // Home/about route
 app.get('/', (req, res) => {
