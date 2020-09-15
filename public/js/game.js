@@ -18,6 +18,8 @@ var allMarkers = [];
 
 var gameData;
 
+var inPostGame = false; // Determines whether the user is currently in "post-game" mode, and can re-view the rounds 
+
 /**
  * Initialise the game.
  *    - Define map object and set-up map events.
@@ -72,7 +74,7 @@ $(document).ready(function () {
         initaliseNewGame();
     }
 
-
+    postGame();
 
 
     // Change "round" text to "r" when mobil
@@ -115,7 +117,7 @@ function loadGame() {
     // Load the first story of the game
     showStory();
     drawGameSummary();
-    postGame();
+    inPostGame = true;
 
     // Update scorecard values
     roundGuesses.forEach((guess) => {
@@ -135,18 +137,22 @@ function postGame() {
 
     // Add hover styling to each label
     cols.forEach((col) => {
-        col.addEventListener('mouseover', () => col.classList.add("scorecardHover"));
-        col.addEventListener('mouseout', () => col.classList.remove("scorecardHover"));
+        col.addEventListener('mouseover', () => {if (inPostGame) col.classList.add("scorecardHover")});
+        col.addEventListener('mouseout', () => {if (inPostGame) col.classList.remove("scorecardHover")});
     });
 
 
     // Show location for round on map, as well as relevant stories
     cols.forEach((col) => {
         col.addEventListener('click', () => {
+
+            if (!inPostGame) return;
+
             let i = cols.findIndex(c => c == col);
             playlist = game.rounds[i];
             storyCounter = 0;
             $('#prevBtn').attr("disabled", "true");
+            $('#nextBtn').attr("disabled", false);
             showStory();
             map.setView([game.rounds[i].coords.lat, game.rounds[i].coords.lng], 15);
         })
@@ -302,7 +308,7 @@ function makeGuess(){
             // Show all locations on map
             drawGameSummary();
 
-            postGame();
+            inPostGame = true;
 
             // Send score to API
             axios.post('/api/score', {score: score, roundScores: roundGuesses, gameId: gameId})
@@ -409,6 +415,7 @@ function initaliseNewGame() {
     $('#nextRoundBtn').hide();
     $('#prevBtn').attr('disabled', false);
     $(`#scoreCard > tbody:nth-child(1) > tr:nth-child(1) td:nth-child(5)`).removeClass('currentRoundCol');
+    inPostGame = false;
 
     // Remove post-game functionality, just incase...
     $(`#scoreCard tr`).unbind();
@@ -490,10 +497,10 @@ function clearMap() {
  * Calculates a score for a round - ranges between 5000 and 0
  * @param {*} dist distance between guess and actual location in km
  */
-function calcScore(x) {
+function calcScore(dist) {
     // y=3460*\exp(-x^2/(2*2000000))+1540*\exp(-x^2/(2*20000000))
 
-    let score = 3460 * Math.exp(- Math.pow(x, 2) / (2 * 2000000) ) + 1540 * Math.exp(- Math.pow(x, 2) / (2 * 20000000) );
+    let score = 3460 * Math.exp(- Math.pow(dist, 2) / (2 * 2000000) ) + 1540 * Math.exp(- Math.pow(dist, 2) / (2 * 20000000) );
 
     return Math.ceil(score);
 }
