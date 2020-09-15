@@ -221,6 +221,9 @@ function showStory() {
     // Bug fix: pause video, incase the next story is an image
     $('#video_player').get(0).pause();
 
+    // Bug fix: prevent duplicates of #BlowupLens
+    $('#BlowupLens').remove();
+
     if (story.isImage) {
         // Hide video player
         $('#video_player').hide();
@@ -501,9 +504,9 @@ function clearMap() {
  * @param {*} dist distance between guess and actual location in km
  */
 function calcScore(dist) {
-    // y=3460*\exp(-x^2/(2*2000000))+1540*\exp(-x^2/(2*20000000))
+    // y=1500*\exp(-x^2/(2*80000))+3500*\exp(-x^2/(3*5500000))
 
-    let score = 3460 * Math.exp(- Math.pow(dist, 2) / (2 * 2000000) ) + 1540 * Math.exp(- Math.pow(dist, 2) / (2 * 20000000) );
+    let score = 1500 * Math.exp(- Math.pow(dist, 2) / (2 * 80000) ) + 3500 * Math.exp(- Math.pow(dist, 2) / (3 * 5500000) );
 
     return Math.ceil(score);
 }
