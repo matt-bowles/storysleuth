@@ -7,7 +7,6 @@ var goodCitiesFilename = 'verifiedCities.json';
 
 var timeago = require("timeago.js");
 var fs = require('fs');
-var path = require('path');
 
 
 // Constants
