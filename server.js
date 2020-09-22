@@ -205,6 +205,11 @@ app.get('/leaderboard', (req, res) => {
   });
 });
 
+// Rules page route
+app.get('/rules', (req, res) => {
+  res.render('rules', getSessionInfo(req));
+})
+
 // Score - POST
 app.post('/api/score', (req, res) => {
   Score.addScore(req, (scoreId) => {
