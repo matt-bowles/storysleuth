@@ -101,25 +101,26 @@ app.get('/players/:id', async (req, res) => {
 
   try {
     info.acc = await Account.findById(req.params.id);
-    info.games = await Score.find({ account: info.acc.id }).sort({create_date: 'desc'}).limit(10);
+
+    info.games = await Score.find({ account: info.acc.id }).sort({create_date: 'desc'});
+    info.recentGames = info.games.slice(0, 10);
 
     // Determines whether or not the "settings" button should be displayed
     // (user must be logged in as the correct account)
     info.displaySettingsButton = (req.isAuthenticated() && req.user._id === req.params.id);
   } catch(err) {
+    console.log(err);
     return res.render('404', getSessionInfo(req));
   }
 
-  Score.find({account: info.acc.id}, 'score').then((scores, err) => {
-    if (err) throw err;
-    
-    // Calculate best/avg using ALL games 
-    if (info.games.length > 0) {
-      info.bestGame = scores.reduce((min, game) => min.score < game.score ? min : game)
-      info.avgScore = Math.round(scores.reduce((total, next) => total + next.score, 0) / scores.length);
-    }
-    res.render('account', info);
-  })
+  // Calculate best/avg using ALL games 
+  if (info.games.length > 0) {
+    info.bestGame = info.games.reduce((min, game) => min.score > game.score ? min : game);
+    info.worstGame = info.games.reduce((min, game) => min.score < game.score ? min : game);
+    info.avgScore = Math.round(info.games.reduce((total, next) => total + next.score, 0) / info.games.length);
+  }
+  res.render('account', info);
+
 });
 
 // The page from which a user can manage their account details
@@ -250,7 +251,10 @@ app.get('/api/game', async (req, res) => {
 
 // View game - GET
 app.get('/games/:gameID', async (req, res) => {
-  var gameData = await Score.find().where({ game: req.params.gameID }).populate('game');
+  var gameData = await Score.findOne().where({ game: req.params.gameID }).populate('game').populate('account', 'username');
+  
+  gameData = {time: moment(gameData.create_date).format('Do of MMMM, YYYY'), ...gameData._doc};
+  
   let info = getSessionInfo(req);
   res.render('game', {gameData: JSON.stringify(gameData), layout: "game-layout", isLoggedIn: info.isLoggedIn, id: info.id, username: info.username });
 });

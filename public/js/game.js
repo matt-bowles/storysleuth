@@ -53,12 +53,18 @@ $(document).ready(function () {
     // Check if existing game is being loaded
     if (gameData) {
         // Extract info from gameData, so that it can be used with existing functions
-        gameData = JSON.parse(gameData)[0];
+        gameData = JSON.parse(gameData);
         game = gameData.game;
         roundGuesses = gameData.roundScores;
         playlist = gameData.game.rounds[0];
 
         loadGame();
+
+        // Display "Played by [player] on the [date]"
+        document.querySelector("#load_player").innerHTML = `<a href="/players/${gameData.account._id}" target="_blank">${gameData.account.username}</a>`;
+        document.querySelector("#load_time").innerHTML = `${gameData.time}`;
+        document.querySelector("#loadBox").hidden = false;
+
     }
     // New game is being played, let the user make guesses, etc.
     else {
