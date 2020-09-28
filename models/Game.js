@@ -59,12 +59,26 @@ module.exports.generateGame = (req, numRounds) => {
   return new Promise(async function(resolve, reject) {
     
     // Essentially the "game" - a collection of rounds
-    var rounds = []; 
+    var rounds = [];
+
+    var unique;
     
-    // Populate game with as many rounds as required (dictated by numRounds)
+    // Populate game with as many non-duplicate rounds as required (dictated by numRounds)
     while (rounds.length < numRounds) {
       try {
-        rounds.push(await Playlist.getPlaylist(req));
+        var pl = await Playlist.getPlaylist(req);
+
+        unique = true;
+
+        // Prevents duplicate locations from being added to the game
+        rounds.filter((c) => {
+          if (pl.coords == c.coords) {
+            unique = false;
+            return;
+          }
+        });
+
+        if (unique) rounds.push(pl);
       } catch (err) {
         console.log("Error - too many requests, not enough successful playlists");
         return reject(err);
@@ -73,6 +87,12 @@ module.exports.generateGame = (req, numRounds) => {
     
     // Save game to database and fulfill promise
     Promise.all(rounds).then((game) => {
+
+      /**
+       * Uncomment to prevent game from being registered in database
+       */
+      // return resolve(game);
+
       addGame(game, (err, g) => {
         if (err) console.log(err);
         console.log("Game generated!");

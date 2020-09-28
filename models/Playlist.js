@@ -30,11 +30,8 @@ module.exports.getPlaylist = (req) => {
     while (timeoutCount <= 10) {
 
       city = await getCity({ 
-        // include: req.include ? req.include.map(c => c.toLowerCase()) : null,
-        // exclude: req.exclude ? req.exclude.map(c => c.toLowerCase()) : null,
-
-        include: req.include ? req.include : null,
-        exclude: req.exclude ? req.exclude : null,
+        include: req.include ? req.include.split(", ") : null,
+        exclude: req.exclude ? req.exclude.split(", ") : null,
        });
 
       // A playlist that contains stories (i.e. a set of related clues for a single location)
@@ -81,6 +78,7 @@ function getCity (options) {
       filtered = cities.filter(c => !(options.exclude).includes(c.country.toLowerCase()));
     }
 
+    // Pick random city from array that was filtered according to criteria
     let city = filtered[Math.floor(Math.random()*filtered.length)];
 
     if (city) {
