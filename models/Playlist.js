@@ -124,14 +124,11 @@ function processPlaylist(playlist, city) {
         : "media.mp4";
   
         stories[i].storyURL = playlist[num].snapInfo.streamingMediaInfo.prefixUrl + suffix;
-  
-        stories[i].isImage = false;
       } 
       
       // It's an image
       else {
         stories[i].storyURL = playlist[num].snapInfo.publicMediaInfo.publicImageMediaInfo.mediaUrl;
-        stories[i].isImage = true;
       }
     }
   

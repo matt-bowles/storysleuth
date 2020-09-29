@@ -22,10 +22,6 @@ const storySchema = mongoose.Schema({
   storyURL: {
     type: String,
     required: true
-  },
-  isImage: {
-    type: Boolean,
-    required: true
   }
 })
 

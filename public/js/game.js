@@ -120,7 +120,7 @@ function loadGame() {
     $('#nextRoundBtn').hide();
 
     // Load the first story of the game
-    showStory();
+    showStory(playlist.stories[storyCounter]);
     drawGameSummary();
     inPostGame = true;
 
@@ -158,7 +158,7 @@ function postGame() {
             storyCounter = 0;
             $('#prevBtn').attr("disabled", "true");
             $('#nextBtn').attr("disabled", false);
-            showStory();
+            showStory(playlist.stories[storyCounter]);
             map.setView([game.rounds[i].coords.lat, game.rounds[i].coords.lng], 15);
         })
     });
@@ -193,7 +193,7 @@ function placeGuessMarker(lat, lng) {
 function nextStory() {
     if (playlist.stories[storyCounter+1]) {
         storyCounter++;
-        showStory();
+        showStory(playlist.stories[storyCounter]);
 
         $('#prevBtn').removeAttr("disabled");
         if (storyCounter+1 == playlist.stories.length) {
@@ -208,7 +208,7 @@ function nextStory() {
 function prevStory() {
     if (playlist.stories[storyCounter-1]) {
     storyCounter--;
-    showStory();
+    showStory(playlist.stories[storyCounter]);
 
     $('#nextBtn').removeAttr("disabled");
         if (storyCounter == 0) {
@@ -221,16 +221,14 @@ function prevStory() {
  * Displays a "video" in the video player, or an image in the image displayer.
  * Also updates the timestamp value.
  */
-function showStory() {
-    var story = playlist.stories[storyCounter];
-
+function showStory(story) {
     // Bug fix: pause video, incase the next story is an image
     $('#video_player').get(0).pause();
 
     // Bug fix: prevent duplicates of #BlowupLens
     $('#BlowupLens').remove();
 
-    if (story.isImage) {
+    if (story.storyURL.includes(".jpg")) {
         // Hide video player
         $('#video_player').hide();
 
@@ -406,7 +404,7 @@ function initaliseNewRound() {
 
     storyCounter = 0;
     playlist = game.rounds[round];
-    showStory();
+    showStory(playlist.stories[storyCounter]);
 
     // Only fix up the map if it has been tampered with (i.e. if it's not the first round).
     if (round !== 0) {
