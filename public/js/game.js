@@ -5,6 +5,7 @@ let playlist = {};      // Holds the stories for the current playlist/round
 let game = [];          // Holds all the rounds for the game
 
 var markers = [];
+var circles = [];
 var locIcon;
 var map;
 
@@ -20,6 +21,14 @@ var gameData;
 
 var inPostGame = false; // Determines whether the user is currently in "post-game" mode, and can re-view the rounds 
 
+var circleOptions = {
+    color: 'green',
+    fillColor: '#32a852',
+    fillOpacity: 0.2,
+    weight: 1,              // Stroke width 
+    radius: 10000           // 10,000m
+}
+
 /**
  * Initialise the game.
  *    - Define map object and set-up map events.
@@ -31,22 +40,7 @@ $(document).ready(function () {
     
     initTouchGestures();
 
-    map = L.map('map', { worldCopyJump: true, minZoom: 1.5 }).setView([0, 0], 0);
-
-    // Add a tileset to the map - very pretty.
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
-    }).addTo(map);
-
-    // Define custom icon for actual location.
-    locIcon = L.icon({
-        iconUrl: '/img/location-icon.png',
-        iconAnchor:   [10, 15], // point of the icon which will correspond to marker's location,
-        iconSize: [30, 30]
-    });
-
-    // Enable the fullscreen plugin for Leaflet
-    map.addControl(new L.Control.Fullscreen());
+    mapSetup();
 
     let gameData = $('#gameData').val();
 
@@ -89,6 +83,25 @@ $(document).ready(function () {
         $('.roundText').text("Round");
     }
 });
+
+function mapSetup() {
+    map = L.map('map', { worldCopyJump: true, minZoom: 1.5 }).setView([0, 0], 0);
+
+    // Add a tileset to the map - very pretty.
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+    }).addTo(map);
+
+    // Define custom icon for actual location.
+    locIcon = L.icon({
+        iconUrl: '/img/location-icon.png',
+        iconAnchor: [10, 15],
+        iconSize: [30, 30]
+    });
+
+    // Enable the fullscreen plugin for Leaflet
+    map.addControl(new L.Control.Fullscreen());
+}
 
 /**
  * Sets up mobile touch gestures for changing stories
@@ -276,6 +289,9 @@ function makeGuess(){
         // Add location marker to map
         markers['locMarker'] = L.marker([playlist.coords.lat, playlist.coords.lng], {icon: locIcon}).addTo(map);
 
+        // Add circle around the marker to show perfect score boundary
+        L.circle([playlist.coords.lat, playlist.coords.lng], circleOptions).addTo(map);
+
         // Show location name when hovering over the marker
         createTooltip(markers['locMarker'], playlist.location);
  
@@ -294,11 +310,8 @@ function makeGuess(){
             $('#prog').css('width', `${(roundScore/5000)*100}%`);
         }, 250);   // ms
 
-
         // Fly to actual location
         map.flyTo(markers['locMarker'].getLatLng());
-
-        
 
         // Update (append) score using the distance between guess and the actual location.
         updateScore(roundScore);
@@ -385,6 +398,8 @@ function drawGameSummary() {
         // Create tooltip which reveals location name
         if (game.rounds[i].location) {
             createTooltip(actualLocMarker, game.rounds[i].location);
+            console.log
+            L.circle([game.rounds[i].coords.lat, game.rounds[i].coords.lng], circleOptions).addTo(map);
         }
 
         allMarkers.push(actualLocMarker);
