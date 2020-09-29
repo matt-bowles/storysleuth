@@ -20,6 +20,7 @@ const ZOOM = 2;         // between 2-18
 module.exports.getPlaylist = (req) => {
 
   // The min. amount of stories a successful playlist must have
+  // Default 5, can range from 1 - 15
   numStories = req.numStories > 0 && req.numstories <=15 ? req.numStories : 5;
 
   return new Promise(async function(resolve, reject) {
@@ -29,9 +30,11 @@ module.exports.getPlaylist = (req) => {
     // Repeat until timeout count is hit - prevents the server from sending too many requests to the Snapchat servers
     while (timeoutCount <= 10) {
 
+      // Find a city that matches any specific options (e.g. include or exclude country)
+      // It is not guaranteed that this city will have a sufficient number of stories available.
       city = await getCity({ 
-        include: req.include ? req.include.split(", ") : null,
-        exclude: req.exclude ? req.exclude.split(", ") : null,
+        include: req.include ? req.include.toLowerCase().split(", ") : null,
+        exclude: req.exclude ? req.exclude.toLowerCase().split(", ") : null,
        });
 
       // A playlist that contains stories (i.e. a set of related clues for a single location)
@@ -39,18 +42,14 @@ module.exports.getPlaylist = (req) => {
       
       try {
         console.log(`${city.city}, ${city.country} - ${pl.elements.length} stories found!`);
-      } catch (error) {}
+      } catch (e) { /* City contained no stories */ }
       
       // If stories exist, and the playlist contains the min. amount of stories...
       if (pl.elements && pl.elements.length >= numStories) {
-
-        data = pl;
-
-        pl = await processPlaylist(pl.elements, city); 
-
-        return resolve(pl);
+        return resolve(await processPlaylist(pl.elements, city));
       }
       else {
+        // City was unsuccessful
         timeoutCount++;
       }
     }
@@ -70,16 +69,18 @@ function getCity (options) {
   
   return new Promise(function(resolve, reject) {
 
-    let filtered = cities;
+    // List of cities is unitially unfiltered
+    let cityList = cities;
     
+    // Filter the cityList according to provided options
     if (options.include) {
-      filtered = cities.filter(c => (options.include).includes(c.country.toLowerCase()));
+      cityList = cities.filter(c => (options.include).includes(c.country.toLowerCase()));
     } else if (options.exclude) {
-      filtered = cities.filter(c => !(options.exclude).includes(c.country.toLowerCase()));
+      cityList = cities.filter(c => !(options.exclude).includes(c.country.toLowerCase()));
     }
 
     // Pick random city from array that was filtered according to criteria
-    let city = filtered[Math.floor(Math.random()*filtered.length)];
+    let city = cityList[Math.floor(Math.random()*cityList.length)];
 
     if (city) {
       resolve(city);
@@ -106,7 +107,8 @@ function processPlaylist(playlist, city) {
       do {
         var num = [Math.floor(Math.random()*playlist.length)]; 
       } while (story_ids.includes(playlist[num].id));
-  
+      
+      // Create the new story object (is populated with timestamp and storyURL)
       stories.push({});
       story_ids.push(playlist[num].id);
   

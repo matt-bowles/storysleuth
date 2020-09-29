@@ -45,12 +45,17 @@ const gameSchema = mongoose.Schema({
 
 const Game = module.exports = mongoose.model('Game', gameSchema);
 
+/**********************************
+ *         GAME FUNCTIONS         *
+ **********************************/
+
 // Generate a game
 module.exports.generateGame = (req, numRounds) => {
   console.log();  // Log a blank for console clarity
   
   // Allow numRounds to be specified through the request (5 by default)
-  numRounds = req.numRounds > 0 && req.numRounds <= 10 ? req.numRounds : 5;
+  // numRounds can be between 1 and 10
+  req.numRounds = req.numRounds > 0 && req.numRounds <= 10 ? req.numRounds : 5;
 
   return new Promise(async function(resolve, reject) {
     
@@ -60,8 +65,9 @@ module.exports.generateGame = (req, numRounds) => {
     var unique;
     
     // Populate game with as many non-duplicate rounds as required (dictated by numRounds)
-    while (rounds.length < numRounds) {
+    while (rounds.length < req.numRounds) {
       try {
+        // A playlist for a location (i.e. a "round")
         var pl = await Playlist.getPlaylist(req);
 
         unique = true;
