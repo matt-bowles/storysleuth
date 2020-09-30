@@ -87,9 +87,14 @@ $(document).ready(function () {
 function mapSetup() {
     map = L.map('map', { worldCopyJump: true, minZoom: 1.5 }).setView([0, 0], 0);
 
+    // Don't even think about it
+    var API_KEY = "pk.eyJ1IjoibWJvd2wxMCIsImEiOiJja2ZvMHpreXcxcmdiMnJwanY4ZmI3MWx3In0.l9ohFCprAAaoElJPBqyVPQ";
+
     // Add a tileset to the map - very pretty.
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+    L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${API_KEY}`, {
+        attribution: '© <a href="https://www.mapbox.com/feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        tileSize: 512,
+        zoomOffset: -1
     }).addTo(map);
 
     // Define custom icon for actual location.
