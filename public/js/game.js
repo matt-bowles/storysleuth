@@ -55,7 +55,11 @@ $(document).ready(function () {
         loadGame();
 
         // Display "Played by [player] on the [date]"
-        document.querySelector("#load_player").innerHTML = `<a href="/players/${gameData.account._id}" target="_blank">${gameData.account.username}</a>`;
+        if (gameData.account) {
+            document.querySelector("#load_player").innerHTML = `<a href="/players/${(gameData.account._id)}" target="_blank">${gameData.account.username}</a>`;
+        } else {
+            document.querySelector("#load_player").innerHTML = `an unregistered user`;
+        }
         document.querySelector("#load_time").innerHTML = `${gameData.time}`;
         document.querySelector("#loadBox").hidden = false;
 
