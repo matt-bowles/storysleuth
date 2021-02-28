@@ -538,3 +538,14 @@ function calcScore(dist) {
 
     return Math.ceil(score);
 }
+
+function adjustZoom(e) {
+    // Scrolling up --> zoom in
+    if (e.deltaY < 0) {
+        $("#image_display").blowup({ scale: 1 });
+    }
+    // Scrolling down --> zoom out
+    else {
+        $("#image_display").blowup({ scale: 0.25 });
+    }
+}

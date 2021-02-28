@@ -100,9 +100,9 @@ app.get('/players/:id', async (req, res) => {
   let info = getSessionInfo(req);
 
   try {
-    info.acc = await Account.findById(req.params.id);
+    info.acc = await Account.findById(req.params.id).lean();
 
-    info.games = await Score.find({ account: info.acc.id }).sort({create_date: 'desc'});
+    info.games = await Score.find({ account: info.acc._id }).sort({create_date: 'desc'}).lean();
     info.recentGames = info.games.slice(0, 10);
 
     // Determines whether or not the "settings" button should be displayed
@@ -113,11 +113,14 @@ app.get('/players/:id', async (req, res) => {
     return res.render('404', getSessionInfo(req));
   }
 
+  // This object holds statistical information about the player, e.g. worst/best game, average score, etc.
+  info.stats = {}
+
   // Calculate best/avg using ALL games 
   if (info.games.length > 0) {
-    info.bestGame = info.games.reduce((min, game) => min.score > game.score ? min : game);
-    info.worstGame = info.games.reduce((min, game) => min.score < game.score ? min : game);
-    info.avgScore = Math.round(info.games.reduce((total, next) => total + next.score, 0) / info.games.length);
+    info.stats.bestGame = info.games.reduce((min, game) => min.score > game.score ? min : game);
+    info.stats.worstGame = info.games.reduce((min, game) => min.score < game.score ? min : game);
+    info.stats.avgScore = Math.round(info.games.reduce((total, next) => total + next.score, 0) / info.games.length);
   }
   res.render('account', info);
 
@@ -135,7 +138,7 @@ app.get('/players/:id/settings', async (req, res) => {
   }
 
   try {
-    info.acc = await Account.findById(req.params.id);
+    info.acc = await Account.findById(req.params.id).lean();
     return res.render('account-settings', info);
   } catch (err) {
     return res.render('404', info);
@@ -199,7 +202,7 @@ app.get('/leaderboard', (req, res) => {
   const n = 25;   // Number of high scores to be retrieved
   let info = getSessionInfo(req);
 
-  Score.find().sort([['score', -1]]).populate('account', 'username').limit(n).then((scores, err) => {
+  Score.find().sort([['score', -1]]).populate('account', 'username').limit(n).lean().then((scores, err) => {
     if (err) throw err;
     info.scores = scores;
     return res.render('leaderboard', info);
@@ -251,12 +254,17 @@ app.get('/api/game', async (req, res) => {
 
 // View game - GET
 app.get('/games/:gameID', async (req, res) => {
-  var gameData = await Score.findOne().where({ game: req.params.gameID }).populate('game').populate('account', 'username');
-  
-  gameData = {time: moment(gameData.create_date).format('Do of MMMM, YYYY'), ...gameData._doc};
-  
-  let info = getSessionInfo(req);
-  res.render('game', {gameData: JSON.stringify(gameData), layout: "game-layout", isLoggedIn: info.isLoggedIn, id: info.id, username: info.username });
+
+  var gameData = await Score.findOne().where({ game: req.params.gameID }).populate('game').populate('username, account').lean();
+
+  try {
+    gameData = {time: moment(gameData.create_date).format('Do of MMMM, YYYY'), ...gameData};
+    let info = getSessionInfo(req);
+    res.render('game', {gameData: JSON.stringify(gameData), layout: "game-layout", isLoggedIn: info.isLoggedIn, id: info.id, username: info.username });
+  } catch(err) {
+    console.log(err);
+    return res.render('404', getSessionInfo(req));
+  }
 });
 
 // Game - POST
