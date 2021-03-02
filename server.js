@@ -121,9 +121,17 @@ app.get('/players/:id', async (req, res) => {
     info.stats.bestGame = info.games.reduce((min, game) => min.score > game.score ? min : game);
     info.stats.worstGame = info.games.reduce((min, game) => min.score < game.score ? min : game);
     info.stats.avgScore = Math.round(info.games.reduce((total, next) => total + next.score, 0) / info.games.length);
-  }
-  res.render('account', info);
+    info.stats.numPerfectGames = info.games.filter(game => game.score >= 25000).length;
+    info.stats.numPerfectRounds = 0;
 
+    // TODO: rewrite - probably not very efficient
+    // Calculate number of perfect rounds
+    info.games.forEach((game) => {
+      info.stats.numPerfectRounds += game.roundScores.filter((rs) => rs.roundScore >= 5000).length; 
+    });
+  }
+
+  res.render('account', info);
 });
 
 // The page from which a user can manage their account details
@@ -156,11 +164,12 @@ app.post('/players/:id/settings', async (req, res) => {
   try {
     // Update account details
     await Account.updateOne({ _id: req.params.id }, {
-      username: req.body.username
+      username: req.body.username,
+      email: req.body.email
     });
 
-    req.flash("success", "Account details updated")
-    return res.redirect(req.originalUrl);
+    req.flash("success", "Account details updated");
+    res.redirect(`/players/${req.params.id}`);
   } catch (err) {
     req.flash(err);
     return res.render('account-settings', info);

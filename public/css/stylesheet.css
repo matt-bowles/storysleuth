@@ -35,6 +35,43 @@ h6 {
   margin: 10em;
 }
 
+/* Account page */
+.statbox {
+  width: 30%;
+  background-color: lightblue;
+  margin: 1%;
+  padding: 0.5%;
+
+  border-radius: 10px;
+  border: 3px black solid;
+
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.statbox .row {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* The "value" for each statbox (i.e. 17,329 points) */
+div.statbox > div:nth-child(1) {
+  color: rgb(65, 65, 65);
+  text-align: center;
+  border-bottom: 2px black solid;
+  padding-bottom: 0.2em;
+  font-weight: bold;
+
+  
+  align-items: center;
+}
+
+/* The "topic" for each statbox (i.e. Average score) */
+div.statbox > div:nth-child(2) {
+  font-style: italic;
+  padding-top: 0.2em;
+}
+
 button:disabled {
   cursor: not-allowed;
   pointer-events: all !important;

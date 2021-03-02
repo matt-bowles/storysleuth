@@ -1,17 +1,37 @@
 <h2>{{ acc.username }}</h2>
 
-<h5><i>Account created on {{ formatDate acc.create_date}}</i></h5>
+<h5><i>Sleuthing since {{ formatDate acc.create_date}}</i></h5>
 
 {{!-- Only display statistics if user has recorded activity --}}
 {{#if games.length}}
-    <h5><i>Number of games played: {{ games.length }}</i></h5>
+    <h3 class="mt-4">Statistics</h3>
 
-    <h5><i>Best score: <a href="/games/{{ stats.bestGame.game }}"> {{ stats.bestGame.score }} points</a> </i></h5>
-
-    <h5><i>Worst score: <a href="/games/{{ stats.worstGame.game }}"> {{ stats.worstGame.score }} points</a> </i></h5>
-
-    <h5><i>Average score: {{ stats.avgScore }} points</i></h5>
-
+    <div class="d-flex align-content-center flex-wrap">
+        <div class="statbox">
+            <div class="row"><span style="align-items: center;">{{ games.length }}</span></div>
+            <div class="row">Games played</div>
+        </div>
+        <div class="statbox">
+            <div class="row">{{ stats.avgScore }} points</div>
+            <div class="row">Average score</div>
+        </div>
+        <div class="statbox">
+            <div class="row"><a href="/games/{{ stats.bestGame.game }}"> {{ stats.bestGame.score }} points</a></div>
+            <div class="row">Best score</div>
+        </div>
+        <div class="statbox">
+            <div class="row"><a href="/games/{{ stats.worstGame.game }}"> {{ stats.worstGame.score }} points</a></div>
+            <div class="row">Worst score</div>
+        </div>
+        <div class="statbox">
+            <div class="row">{{ stats.numPerfectGames }}</div>
+            <div class="row">Perfect games</div>
+        </div>
+        <div class="statbox">
+            <div class="row">{{ stats.numPerfectRounds }}</div>
+            <div class="row">Perfect rounds</div>
+        </div>
+    </div>
     <h3 class="mt-4">Recent games</h3>
 {{else}}
     <h4 class="mt-3">No recorded games. <a href="/play">Go rack up some scores.</a></h4>
@@ -29,7 +49,7 @@
             </a>
         </div>
 
-                <div class="col">
+        <div class="col">
             {{ formatDate create_date }}
         </div>
 
