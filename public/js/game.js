@@ -272,7 +272,10 @@ function showStory(story) {
 
     // Show timestamp.
     // e.g. Clue 1/5: 9 hours ago
-    $('#timestamp').html(`<b>Clue ${storyCounter + 1}/${playlist.stories.length}:</b> ${playlist.stories[storyCounter].timestamp}`);
+    $('#timestamp').html(`
+    <b>Clue ${storyCounter + 1}/${playlist.stories.length}:</b> 
+    <span title="UTC format here soon...">${timeago.format(playlist.stories[storyCounter].timestamp)}</span>
+    `);
 }
 
 /**

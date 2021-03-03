@@ -113,8 +113,7 @@ function processPlaylist(playlist, city) {
       story_ids.push(playlist[num].id);
   
       // Get timestamp for each story - How long ago was the story posted?
-      let timestamp = playlist[num].timestamp;
-      stories[i].timestamp = timeago.format(timestamp);
+      stories[i].timestamp = playlist[num].timestamp;
   
       // It's a video
       if (playlist[num].snapInfo.snapMediaType) {
