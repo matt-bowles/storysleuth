@@ -274,7 +274,7 @@ function showStory(story) {
     // e.g. Clue 1/5: 9 hours ago
     $('#timestamp').html(`
     <b>Clue ${storyCounter + 1}/${playlist.stories.length}:</b> 
-    <span title="UTC format here soon...">${timeago.format(playlist.stories[storyCounter].timestamp)}</span>
+    <span title="UTC format here soon...">${isNaN(playlist.stories[storyCounter].timestamp) ? playlist.stories[storyCounter].timestamp : timeago.format(playlist.stories[storyCounter].timestamp)}</span>
     `);
 }
 
