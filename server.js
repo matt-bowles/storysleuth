@@ -28,13 +28,17 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.engine('handlebars', exphbs({
-  // Customer helpers
+  // Custom helpers
   helpers: {
     'incrementByOne': (num) => { num++; return num },
     'formatDate': (date) => { return moment(date).format('DD MMMM YYYY') },
     'bestScore': (games) => {
       let bestGame = games.reduce((min, game) => min.score < game.score ? min : game);
       return { id: bestGame.id, score: bestGame.score };
+    },
+    'truncateUsername': (name) => {
+      const maxLen = 45;
+      return (name.length > maxLen) ? `<span title="${name}">${name.substring(0, maxLen)}...</span>` : name;
     }
   }
 }));
@@ -167,6 +171,8 @@ app.post('/players/:id/settings', async (req, res) => {
       username: req.body.username,
       email: req.body.email
     });
+
+    req.user.username = req.body.username;
 
     req.flash("success", "Account details updated");
     res.redirect(`/players/${req.params.id}`);

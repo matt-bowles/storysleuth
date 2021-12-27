@@ -56,6 +56,8 @@ $(document).ready(function () {
 
         // Display "Played by [player] on the [date]"
         if (gameData.account) {
+            // Bad bad not good - shortens username if required
+            gameData.account.username = (gameData.account.username.length > 45) ? `${gameData.account.username.substring(0, 45)}...` : gameData.account.username;
             document.querySelector("#load_player").innerHTML = `<a href="/players/${(gameData.account._id)}" target="_blank">${gameData.account.username}</a>`;
         } else {
             document.querySelector("#load_player").innerHTML = `an unregistered user`;

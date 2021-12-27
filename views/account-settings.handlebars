@@ -1,5 +1,5 @@
 <form action="/players/{{ acc._id }}/settings" method="post">
-    <h2 class="text-center mb-4">Settings - {{ acc.username }}</h2>       
+    <h2 class="text-center mb-4">Settings - {{{ truncateUsername acc.username }}}</h2>       
     <div class="form-group">
         <label for="username">Username</label>
         <input type="text" name="username" class="form-control" placeholder="Username" required value={{ acc.username }}>
