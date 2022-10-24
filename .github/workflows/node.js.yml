@@ -25,9 +25,9 @@ jobs:
     
     steps:
     - run: pm2 stop storysleuth
+    - uses: actions/checkout@v3   # Checkout code from repo
     - run: git clean -n -f -d
     - run: git pull
-    - uses: actions/checkout@v3   # Checkout code from repo
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
