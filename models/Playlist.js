@@ -1,7 +1,7 @@
 // This module doesn't use a local database,
 // instead it fetches data from Snapchat's API.
 
-var snapMap = require('snapmap');
+var snapMap = require('snap-map-private-api');
 var cities = require('../verifiedCities.json');
 var goodCitiesFilename = 'verifiedCities.json';
 
