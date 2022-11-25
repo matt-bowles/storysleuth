@@ -119,7 +119,7 @@ function processPlaylist(playlist, city) {
       stories[i].storyURL = playlist[num].snapInfo.streamingMediaInfo.mediaUrl;
 
       // Determine whether story is an image or video
-      stories[i].isImage = !(playlist[num].snapInfo.snapMediaType === 'SNAP_MEDIA_TYPE_VIDEO');
+      stories[i].isImage = !(playlist[num].snapInfo.hasOwnProperty("snapMediaType"));
     }
   
     addCity(city); 

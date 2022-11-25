@@ -286,8 +286,6 @@ function showStory(story) {
     // Bug fix: prevent duplicates of #BlowupLens
     $('#BlowupLens').remove();
 
-    console.log(story);
-
     if (story.isImage) {
         // Hide video player
         $('#video_player').hide();
