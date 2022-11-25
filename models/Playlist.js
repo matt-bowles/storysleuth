@@ -115,22 +115,11 @@ function processPlaylist(playlist, city) {
       // Get timestamp for each story - How long ago was the story posted?
       stories[i].timestamp = playlist[num].timestamp;
   
-      // It's a video
-      if (playlist[num].snapInfo.snapMediaType) {
-        // Find suffix (depending whether there is an overlay or not)
-        var suffix = playlist[num].snapInfo.streamingMediaInfo.overlayUrl 
-        // -- video has snapchat overlay --
-        ? "embedded.mp4"
-        // -- video doesn't have overlay --
-        : "media.mp4";
-  
-        stories[i].storyURL = playlist[num].snapInfo.streamingMediaInfo.prefixUrl + suffix;
-      } 
-      
-      // It's an image
-      else {
-        stories[i].storyURL = playlist[num].snapInfo.publicMediaInfo.publicImageMediaInfo.mediaUrl;
-      }
+      // Both images/videos are stored here
+      stories[i].storyURL = playlist[num].snapInfo.streamingMediaInfo.mediaUrl;
+
+      // Determine whether story is an image or video
+      stories[i].isImage = !(playlist[num].snapInfo.snapMediaType === 'SNAP_MEDIA_TYPE_VIDEO');
     }
   
     addCity(city); 

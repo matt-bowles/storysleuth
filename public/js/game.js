@@ -44,6 +44,9 @@ $(document).ready(function () {
 
     let gameData = $('#gameData').val();
 
+    // Set-up some hotkeys
+    initHotkeys();
+
     // Check if existing game is being loaded
     if (gameData) {
         // Extract info from gameData, so that it can be used with existing functions
@@ -133,6 +136,37 @@ function initTouchGestures() {
         e.preventDefault();
         nextStory();
     });
+}
+
+/**
+ * Set-ups the hotkeys for the game screen:
+ * - Z: previous clue
+ * - X: next clue
+ * - C: guess with current location
+ */
+function initHotkeys() {
+    document.onkeydown = (e) => {
+        const { key } = e;
+
+        // Z: previous clue
+        if (key === "z") prevStory();
+
+        // X: next clue
+        else if (key === "x") nextStory();
+
+        // C: guess, next round, or new game (depending on which button is visible)
+        else if (key === "c") {
+            if ($('#guessButton').is(':enabled')) {
+                makeGuess();
+            } else if (inPostGame) {
+                initaliseNewGame();
+            } else if ($('#nextRoundBtn').is(':enabled')) {
+                initaliseNewRound();
+            }
+
+            // ($('#guessButton').is(':enabled')) ? makeGuess() : initaliseNewRound();
+        }
+    }
 }
 
 /**
@@ -252,7 +286,9 @@ function showStory(story) {
     // Bug fix: prevent duplicates of #BlowupLens
     $('#BlowupLens').remove();
 
-    if (story.storyURL.includes(".jpg")) {
+    console.log(story);
+
+    if (story.isImage) {
         // Hide video player
         $('#video_player').hide();
 
@@ -412,7 +448,6 @@ function drawGameSummary() {
         // Create tooltip which reveals location name
         if (game.rounds[i].location) {
             createTooltip(actualLocMarker, game.rounds[i].location);
-            console.log
             L.circle([game.rounds[i].coords.lat, game.rounds[i].coords.lng], circleOptions).addTo(map);
         }
 
