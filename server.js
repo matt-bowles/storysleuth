@@ -217,7 +217,7 @@ app.get('/leaderboard', (req, res) => {
   const n = 25;   // Number of high scores to be retrieved
   let info = getSessionInfo(req);
 
-  Score.find().sort([['score', -1]]).populate('account', 'username').limit(n).lean().then((scores, err) => {
+  Score.find().sort([['score', -1]]).populate('account', 'username').limit(n).lean().sort('create_date').then((scores, err) => {
     if (err) throw err;
     info.scores = scores;
     return res.render('leaderboard', info);
